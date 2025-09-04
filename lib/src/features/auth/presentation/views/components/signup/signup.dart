@@ -28,14 +28,7 @@ class _SignUpComponent extends ConsumerWidget {
               ),
               suffixWidget: _getSuffixIcon(con: vm.emailCont),
             ),
-            SizedBox(
-              height: ResponsiveHelper.responsiveSpacing(
-                data: data,
-                mobile: 16.0,
-                tablet: 20.0,
-                desktop: 24.0,
-              ),
-            ),
+            30.verticalSpace,
             CustomInputField(
               hint: "Enter your name.",
               title: 'Name',
@@ -50,49 +43,21 @@ class _SignUpComponent extends ConsumerWidget {
               ),
               suffixWidget: _getSuffixIcon(con: vm.nameCont),
             ),
-            SizedBox(
-              height: ResponsiveHelper.responsiveSpacing(
-                data: data,
-                mobile: 16.0,
-                tablet: 20.0,
-                desktop: 24.0,
-              ),
-            ),
+            30.verticalSpace,
             _DOBPicker(
               setDate: (DateTime date) => vm.setDate(date),
               controller: vm.dobCon,
             ),
-            SizedBox(
-              height: ResponsiveHelper.responsiveSpacing(
-                data: data,
-                mobile: 16.0,
-                tablet: 20.0,
-                desktop: 24.0,
-              ),
-            ),
+            30.verticalSpace,
             _PasswordForm(_signUpVMProvider),
-            SizedBox(
-              height: ResponsiveHelper.responsiveSpacing(
-                data: data,
-                mobile: 10.0,
-                tablet: 12.0,
-                desktop: 16.0,
-              ),
-            ),
+            40.verticalSpace,
             CustomButton(
               title: "SIGN UP",
               onPressed: () => vm.registerUser(),
               bgColor: AppColors.primaryColor,
               textColor: AppColors.whiteColor,
             ),
-            SizedBox(
-              height: ResponsiveHelper.responsiveSpacing(
-                data: data,
-                mobile: 10.0,
-                tablet: 12.0,
-                desktop: 16.0,
-              ),
-            ),
+            30.verticalSpace,
           ],
         );
       },
@@ -106,7 +71,7 @@ class _SignUpComponent extends ConsumerWidget {
             color: con.error != null
                 ? AppColors.redColor
                 : AppColors.primaryColor,
-            size: 18.sp,
+
           )
         : null;
   }

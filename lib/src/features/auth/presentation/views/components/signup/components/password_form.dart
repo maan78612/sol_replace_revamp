@@ -21,14 +21,7 @@ class _PasswordForm extends ConsumerWidget {
               controller: signUpVM.passwordCont,
               onChange: (value) => signUpVM.validatePassword(value),
             ),
-            SizedBox(
-              height: ResponsiveHelper.responsiveSpacing(
-                data: data,
-                mobile: 24.0,
-                tablet: 28.0,
-                desktop: 32.0,
-              ),
-            ),
+            30.verticalSpace,
             CustomInputField(
               title: 'Confirm Password',
               titleIcon: AppIcons.lock,
@@ -46,7 +39,8 @@ class _PasswordForm extends ConsumerWidget {
               ),
             ),
 
-            if (signUpVM.shouldShowPasswordValidation) _passwordValidator(signUpVM),
+            if (signUpVM.shouldShowPasswordValidation)
+              _passwordValidator(signUpVM),
           ],
         );
       },

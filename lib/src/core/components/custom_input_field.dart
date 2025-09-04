@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:sol_replace_revamp/src/core/components/custom_inkwell.dart';
 import 'package:sol_replace_revamp/src/core/components/custom_text_controller.dart';
@@ -8,88 +7,120 @@ import 'package:sol_replace_revamp/src/core/constants/colors.dart';
 import 'package:sol_replace_revamp/src/core/constants/fonts.dart';
 import 'package:sol_replace_revamp/src/core/utilities/responsive_helper.dart';
 
+// ============================================================================
+// MAIN INPUT FIELD WIDGET
+// ============================================================================
+
 class CustomInputField extends StatefulWidget {
+  // Content parameters
   final String? hint;
   final String? title;
   final String? label;
+  final String? titleIcon;
   final Widget? prefixWidget;
+  final Widget? suffixWidget;
+
+  // Controller
   final CustomTextController controller;
+
+  // Behavior parameters
   final TextInputType? keyboardType;
   final bool obscure;
   final bool expands;
   final bool enabled;
   final bool textAlignCenter;
   final int? maxLines;
+  final bool autoFocus;
+  final bool showCounterText;
+  final int? maxLength;
+  final List<TextInputFormatter>? inputFormatters;
+  final TextInputAction? textInputAction;
+
+  // Style parameters
   final Color fillColor;
+  final Color? focusColor;
+  final Color? titleColor;
+  final double borderRadius;
+  final double borderWidth;
+  final bool isFilled;
+  final bool isDecorationEnabled;
+  final TextStyle? textStyle;
+  final TextStyle? hintStyle;
+
+  // Dimension parameters
+  final double titleFontSize;
+  final double subTitleFontSize;
+  final double titleIconSize;
+  final double prefixMaxHeight;
+  final double prefixMaxWidth;
+  final EdgeInsets? contentPadding;
+  final EdgeInsetsGeometry? titlePadding;
+  final EdgeInsetsGeometry? errorPadding;
+
+  // Callback parameters
   final VoidCallback? onTap;
   final ValueChanged<String>? onChange;
   final VoidCallback? onEditingComplete;
-  final bool isDecorationEnabled;
-  final bool autoFocus;
-  final Color? focusColor;
-  final Color? titleColor;
-  final List<TextInputFormatter>? inputFormatters;
-  final TextInputAction? textInputAction;
-  final double borderRadius;
-  final Widget? suffixWidget;
   final ValueChanged<String>? onSubmit;
-  final int? maxLength;
-  final EdgeInsets? contentPadding;
-  final double borderWidth;
-  final double titleIconSize;
-  final TextStyle? hintStyle;
-  final TextStyle? textStyle;
-  final bool isFilled;
-  final double titleFontSize;
-  final double subTitleFontSize;
-  final String? titleIcon;
-  final EdgeInsetsGeometry? titlePadding;
-  final EdgeInsetsGeometry? errorPadding;
-  final double prefixMaxHeight;
-  final double prefixMaxWidth;
-  final bool showCounterText;
+
+  // Accessibility parameters
+  final String? semanticLabel;
+  final String? semanticHint;
+  final bool excludeSemantics;
+  final String? restorationId;
 
   const CustomInputField({
     super.key,
+    // Content
     this.hint,
     this.title,
     this.label,
+    this.titleIcon,
     this.prefixWidget,
-    this.prefixMaxHeight = 20,
-    this.prefixMaxWidth = 60,
+    this.suffixWidget,
+    // Controller
     required this.controller,
+    // Behavior
     this.keyboardType,
     this.obscure = false,
     this.expands = false,
     this.enabled = true,
     this.textAlignCenter = false,
     this.maxLines = 1,
+    this.autoFocus = false,
+    this.showCounterText = false,
+    this.maxLength,
+    this.inputFormatters,
+    this.textInputAction = TextInputAction.done,
+    // Style
+    this.fillColor = Colors.transparent,
+    this.focusColor,
+    this.titleColor = AppColors.blackColor,
+    this.borderRadius = 12,
+    this.borderWidth = 1,
+    this.isFilled = true,
+    this.isDecorationEnabled = true,
+    this.textStyle,
+    this.hintStyle,
+    // Dimensions
+    this.titleFontSize = 16,
+    this.subTitleFontSize = 12,
+    this.titleIconSize = 24,
+    this.prefixMaxHeight = 20,
+    this.prefixMaxWidth = 60,
+    this.contentPadding,
+    this.titlePadding,
+    this.errorPadding,
+    // Callbacks
     this.onTap,
     this.onChange,
     this.onEditingComplete,
-    this.isDecorationEnabled = true,
-    this.autoFocus = false,
-    this.focusColor,
-    this.titleColor = AppColors.blackColor,
-    this.inputFormatters,
-    this.textInputAction = TextInputAction.done,
-    this.borderRadius = 80,
-    this.suffixWidget,
     this.onSubmit,
-    this.maxLength,
-    this.contentPadding,
-    this.borderWidth = 1,
-    this.hintStyle,
-    this.textStyle,
-    this.isFilled = true,
-    this.titleFontSize = 16,
-    this.subTitleFontSize = 12,
-    this.titleIcon,
-    this.titlePadding,
-    this.errorPadding,
-    this.titleIconSize = 24,
-    this.fillColor = AppColors.blackColor,
-    this.showCounterText = false,
+    // Accessibility
+    this.semanticLabel,
+    this.semanticHint,
+    this.excludeSemantics = false,
+    this.restorationId,
   });
 
   @override
@@ -116,70 +147,41 @@ class _CustomInputFieldState extends State<CustomInputField> {
   @override
   Widget build(BuildContext context) {
     return ResponsiveWidget(
-      builder: (context, data) {
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            return ValueListenableBuilder<bool>(
-              valueListenable: widget.controller.hasFocusNotifier,
-              builder: (context, hasFocus, _) {
-                final fieldWidth = _getMaxFieldWidth(data, constraints.maxWidth);
-                return ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: fieldWidth,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (widget.title != null || widget.titleIcon != null) ...[
-                        _buildTitleSection(data, fieldWidth),
-                        SizedBox(
-                          height: ResponsiveHelper.responsiveSpacing(
-                            data: data,
-                            mobile: 10.0,
-                            tablet: 12.0,
-                            desktop: 14.0,
-                          ),
-                        ),
-                      ],
-                      _buildTextField(hasFocus, data, fieldWidth),
-                    ],
-                  ),
+      builder: (context, data) => LayoutBuilder(
+        builder: (context, constraints) => ValueListenableBuilder<bool>(
+          valueListenable: widget.controller.hasFocusNotifier,
+          builder: (context, hasFocus, _) {
+            final fieldWidth =
+                InputFieldDimensionsCalculator.calculateFieldWidth(
+                  data,
+                  constraints.maxWidth,
                 );
-              },
+
+            return ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: fieldWidth),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (_shouldShowTitle()) ...[
+                    _buildTitleSection(data, fieldWidth),
+                    _buildTitleSpacing(data),
+                  ],
+                  _buildTextField(hasFocus, data, fieldWidth),
+                ],
+              ),
             );
           },
-        );
-      },
+        ),
+      ),
     );
   }
 
-  /// Get maximum width for input fields based on available container space
-  double _getMaxFieldWidth(ResponsiveData data, double availableWidth) {
-    // For mobile screen OR mobile-sized container, use full available width
-    if (data.isMobileRange || availableWidth <= ResponsiveConfig.mobileLarge) {
-      return availableWidth;
-    }
-
-    // For tablet and desktop, use a percentage of the available container width
-    // This ensures fields don't become too wide in flex containers
-    return ResponsiveHelper.value<double>(
-      data: data,
-      mobile: availableWidth,
-      mobileLarge: availableWidth * 0.95,
-      tablet: availableWidth * 0.85,
-      // Use 85% of container width
-      tabletLarge: availableWidth * 0.75,
-      // Use 80% of container width
-      desktop: availableWidth * 0.7,
-      // Use 75% of container width
-      desktopLarge: availableWidth * 0.65,
-      // Use 70% of container width
-      ultraWide: availableWidth * 0.65,
-      // Use 65% of container width
-      fallback: availableWidth,
-    );
+  /// Check if title section should be displayed
+  bool _shouldShowTitle() {
+    return widget.title != null || widget.titleIcon != null;
   }
 
+  /// Build the title section with icon and error text
   Widget _buildTitleSection(ResponsiveData data, double availableWidth) {
     return Padding(
       padding: widget.titlePadding ?? EdgeInsets.zero,
@@ -189,14 +191,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
         children: [
           if (widget.titleIcon != null) ...[
             _buildTitleIcon(data, availableWidth),
-            SizedBox(
-              width: ResponsiveHelper.responsiveSpacing(
-                data: data,
-                mobile: 8.0,
-                tablet: 10.0,
-                desktop: 12.0,
-              ),
-            ),
+            _buildTitleIconSpacing(data),
           ],
           if (widget.title != null)
             Text(
@@ -210,56 +205,50 @@ class _CustomInputFieldState extends State<CustomInputField> {
                 color: widget.titleColor,
               ),
             ),
-          SizedBox(
-            width: ResponsiveHelper.responsiveSpacing(
-              data: data,
-              mobile: 16.0,
-              tablet: 18.0,
-              desktop: 20.0,
-            ),
-          ),
+          _buildTitleErrorSpacing(data),
           Expanded(child: _buildErrorText(data)),
         ],
       ),
     );
   }
 
-  Widget _buildTitleIcon(ResponsiveData data, double availableWidth) {
-    // Base icon size on container width for better proportions
-    final baseSize = availableWidth * 0.06; // 6% of container width
-    final size = ResponsiveHelper.value<double>(
-      data: data,
-      mobile: baseSize.clamp(20.0, 24.0),
-      // Clamp between 18-22px
-      tablet: baseSize.clamp(22.0, 26.0),
-      // Clamp between 20-24px
-      desktop: baseSize.clamp(24.0, 28.0),
-      // Clamp between 22-26px
-      ultraWide: baseSize.clamp(26.0, 30.0),
-      // Don't go bigger
-      fallback: 20.0,
-    );
-
-    return Container(
-      width: size,
-      height: size,
-      decoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        color: AppColors.primaryColor,
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(size / 7),
-        child: SvgPicture.asset(
-          widget.titleIcon!,
-          colorFilter: const ColorFilter.mode(
-            AppColors.blackColor,
-            BlendMode.srcIn,
-          ),
-        ),
+  /// Build spacing between title icon and title text
+  Widget _buildTitleIconSpacing(ResponsiveData data) {
+    return SizedBox(
+      width: ResponsiveHelper.responsiveSpacing(
+        data: data,
+        mobile: 8.0,
+        tablet: 10.0,
+        desktop: 12.0,
       ),
     );
   }
 
+  /// Build spacing between title and error text
+  Widget _buildTitleErrorSpacing(ResponsiveData data) {
+    return SizedBox(
+      width: ResponsiveHelper.responsiveSpacing(
+        data: data,
+        mobile: 16.0,
+        tablet: 18.0,
+        desktop: 20.0,
+      ),
+    );
+  }
+
+  /// Build spacing between title section and text field
+  Widget _buildTitleSpacing(ResponsiveData data) {
+    return SizedBox(
+      height: ResponsiveHelper.responsiveSpacing(
+        data: data,
+        mobile: 10.0,
+        tablet: 12.0,
+        desktop: 14.0,
+      ),
+    );
+  }
+
+  /// Build error text widget
   Widget _buildErrorText(ResponsiveData data) {
     return Padding(
       padding: widget.errorPadding ?? EdgeInsets.zero,
@@ -280,6 +269,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
     );
   }
 
+  /// Build the main text field widget
   Widget _buildTextField(
     bool hasFocus,
     ResponsiveData data,
@@ -298,58 +288,61 @@ class _CustomInputFieldState extends State<CustomInputField> {
       desktop: 22.0,
     );
 
-    final verticalPadding = ResponsiveHelper.responsiveSpacing(
-      data: data,
-      mobile: 12.0,
-      tablet: 14.0,
-      desktop: 16.0,
-    );
-
     return TextFormField(
+      // Basic configuration
       autofocus: widget.autoFocus,
       focusNode: widget.controller.focusNode,
-      onFieldSubmitted: widget.onSubmit,
-      maxLength: widget.maxLength,
-      cursorColor: AppColors.primaryColor,
-      expands: widget.expands,
-      maxLines: widget.expands ? null : widget.maxLines,
-      minLines: widget.expands ? null : widget.maxLines,
-      onTap: widget.onTap,
-      cursorHeight: cursorHeight,
-      onChanged: widget.onChange,
-      onEditingComplete: widget.onEditingComplete,
-      enabled: widget.enabled,
       controller: widget.controller.controller,
+      enabled: widget.enabled,
+      restorationId: widget.restorationId,
+
+      // Text configuration
       textAlign: widget.textAlignCenter ? TextAlign.center : TextAlign.start,
       textAlignVertical: TextAlignVertical.center,
-      style: _buildTextStyle(fontSize, data),
+      style:
+          widget.textStyle ??
+          FontStyles.montserratRegular.copyWith(
+            fontSize: fontSize,
+            color: AppColors.blackColor,
+          ),
+
+      // Input configuration
       keyboardType: widget.keyboardType,
       inputFormatters: widget.inputFormatters,
+      textInputAction: widget.textInputAction,
       obscureText: _obscureText,
       obscuringCharacter: "•",
-      textInputAction: widget.textInputAction,
+
+      // Length and expansion
+      maxLength: widget.maxLength,
+      maxLines: widget.expands ? null : widget.maxLines,
+      minLines: widget.expands ? null : widget.maxLines,
+      expands: widget.expands,
+
+      // Visual configuration
+      cursorColor: AppColors.primaryColor,
+      cursorHeight: cursorHeight,
+
+      // Callbacks
+      onTap: widget.onTap,
+      onChanged: widget.onChange,
+      onEditingComplete: widget.onEditingComplete,
+      onFieldSubmitted: widget.onSubmit,
+
+      // Decoration
       decoration: _buildInputDecoration(
         hasFocus,
         fontSize,
-        verticalPadding,
         data,
         availableWidth,
       ),
     );
   }
 
-  TextStyle? _buildTextStyle(double fontSize, ResponsiveData data) {
-    return widget.textStyle ??
-        FontStyles.montserratRegular.copyWith(
-          fontSize: fontSize,
-          color: AppColors.whiteColor,
-        );
-  }
-
+  /// Build the input decoration with borders, icons, and styling
   InputDecoration _buildInputDecoration(
     bool hasFocus,
     double fontSize,
-    double verticalPadding,
     ResponsiveData data,
     double availableWidth,
   ) {
@@ -360,63 +353,60 @@ class _CustomInputFieldState extends State<CustomInputField> {
       desktop: 17.0,
     );
 
-    // Icon constraints based on available width to prevent overflow
-    // Prefix icon dimensions (percentage of available width)
-    final prefixMaxHeight = ResponsiveHelper.value<double>(
+    final verticalPadding = ResponsiveHelper.responsiveSpacing(
       data: data,
-      mobile: (availableWidth * 0.12).clamp(28.0, 40.0),    // 12% of width, clamped
-      tablet: (availableWidth * 0.10).clamp(32.0, 44.0),    // 10% of width, clamped
-      desktop: (availableWidth * 0.08).clamp(36.0, 48.0),   // 8% of width, clamped
-      ultraWide: (availableWidth * 0.07).clamp(36.0, 50.0), // 7% of width, clamped
-      fallback: 36.0,
+      mobile: 12.0,
+      tablet: 14.0,
+      desktop: 16.0,
     );
 
-    final prefixMaxWidth = ResponsiveHelper.value<double>(
-      data: data,
-      mobile: (availableWidth * 0.15).clamp(36.0, 50.0),    // 15% of width, clamped
-      tablet: (availableWidth * 0.12).clamp(40.0, 55.0),    // 12% of width, clamped
-      desktop: (availableWidth * 0.10).clamp(44.0, 60.0),   // 10% of width, clamped
-      ultraWide: (availableWidth * 0.08).clamp(44.0, 65.0), // 8% of width, clamped
-      fallback: 44.0,
-    );
+    // Calculate icon constraints
+    final prefixConstraints =
+        InputFieldDimensionsCalculator.calculateIconConstraints(
+          data,
+          availableWidth,
+          heightPercentage: 0.12,
+          widthPercentage: 0.15,
+          minHeight: 28.0,
+          maxHeight: 50.0,
+          minWidth: 36.0,
+          maxWidth: 65.0,
+        );
 
-    // Suffix icon dimensions (percentage of available width)
-    final suffixMaxHeight = ResponsiveHelper.value<double>(
-      data: data,
-      mobile: (availableWidth * 0.12).clamp(28.0, 40.0),    // 12% of width, clamped
-      tablet: (availableWidth * 0.10).clamp(32.0, 44.0),    // 10% of width, clamped
-      desktop: (availableWidth * 0.08).clamp(36.0, 48.0),   // 8% of width, clamped
-      ultraWide: (availableWidth * 0.07).clamp(36.0, 50.0), // 7% of width, clamped
-      fallback: 36.0,
-    );
-
-    final suffixMaxWidth = ResponsiveHelper.value<double>(
-      data: data,
-      mobile: (availableWidth * 0.15).clamp(36.0, 50.0),    // 15% of width, clamped
-      tablet: (availableWidth * 0.12).clamp(40.0, 55.0),    // 12% of width, clamped
-      desktop: (availableWidth * 0.10).clamp(44.0, 60.0),   // 10% of width, clamped
-      ultraWide: (availableWidth * 0.08).clamp(44.0, 65.0), // 8% of width, clamped
-      fallback: 44.0,
-    );
+    final suffixConstraints =
+        InputFieldDimensionsCalculator.calculateIconConstraints(
+          data,
+          availableWidth,
+          heightPercentage: 0.12,
+          widthPercentage: 0.15,
+          minHeight: 28.0,
+          maxHeight: 50.0,
+          minWidth: 36.0,
+          maxWidth: 65.0,
+        );
 
     return InputDecoration(
-      focusColor: widget.focusColor ?? AppColors.primaryColor,
+      // Text and labels
       hintText: widget.hint,
       labelText: widget.label,
       labelStyle: TextStyle(
         color: hasFocus ? AppColors.primaryColor : AppColors.whiteColor,
       ),
+      hintStyle:
+          widget.hintStyle ??
+          FontStyles.montserratRegular.copyWith(
+            fontSize: fontSize,
+            color: AppColors.greyColor,
+          ),
+
+      // Counter
       counterText: widget.showCounterText ? null : "",
       counterStyle: FontStyles.montserratRegular.copyWith(
         fontSize: fontSize,
         color: AppColors.primaryColor,
       ),
-      hintStyle:
-          widget.hintStyle ??
-          FontStyles.montserratRegular.copyWith(
-            fontSize: fontSize,
-            color: AppColors.lightGreyColor,
-          ),
+
+      // Padding and fill
       contentPadding:
           widget.contentPadding ??
           EdgeInsets.symmetric(
@@ -425,24 +415,24 @@ class _CustomInputFieldState extends State<CustomInputField> {
           ),
       filled: widget.isFilled,
       fillColor: widget.fillColor,
+      focusColor: widget.focusColor ?? AppColors.primaryColor,
+
+      // Borders
       border: _getInputBorder(hasFocus, data),
       enabledBorder: _getInputBorder(hasFocus, data),
       errorBorder: _getInputBorder(hasFocus, data),
       focusedBorder: _getFocusedBorder(hasFocus, data),
       disabledBorder: _getInputBorder(hasFocus, data),
-      prefixIconConstraints: BoxConstraints(
-        maxHeight: prefixMaxHeight,
-        maxWidth: prefixMaxWidth,
-      ),
-      suffixIconConstraints: BoxConstraints(
-        maxHeight: suffixMaxHeight,
-        maxWidth: suffixMaxWidth,
-      ),
+
+      // Icon constraints and widgets
+      prefixIconConstraints: prefixConstraints,
+      suffixIconConstraints: suffixConstraints,
       prefixIcon: _buildPrefixIcon(data),
-      suffixIcon: _buildSuffixIcon(data),
+      suffixIcon: _buildSuffixIcon(data, availableWidth),
     );
   }
 
+  /// Get input border
   InputBorder _getInputBorder(bool hasFocus, ResponsiveData data) {
     if (!widget.isDecorationEnabled) return InputBorder.none;
 
@@ -462,6 +452,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
     );
   }
 
+  /// Get focused border
   InputBorder _getFocusedBorder(bool hasFocus, ResponsiveData data) {
     return _getInputBorder(hasFocus, data).copyWith(
       borderSide: BorderSide(
@@ -471,6 +462,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
     );
   }
 
+  /// Get border color
   Color _getBorderColor(bool hasFocus) {
     if (!widget.isDecorationEnabled) return Colors.transparent;
     return widget.controller.error == null
@@ -478,6 +470,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
         : AppColors.redColor;
   }
 
+  /// Get focus border color
   Color _getFocusBorderColor(bool hasFocus) {
     if (!widget.isDecorationEnabled) return Colors.transparent;
     return widget.controller.error == null
@@ -485,6 +478,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
         : AppColors.redColor;
   }
 
+  /// Build prefix icon
   Widget? _buildPrefixIcon(ResponsiveData data) {
     if (widget.prefixWidget == null) return null;
 
@@ -508,7 +502,8 @@ class _CustomInputFieldState extends State<CustomInputField> {
     );
   }
 
-  Widget? _buildSuffixIcon(ResponsiveData data) {
+  /// Build suffix icon
+  Widget? _buildSuffixIcon(ResponsiveData data, double availableWidth) {
     final horizontalPadding = ResponsiveHelper.responsiveSpacing(
       data: data,
       mobile: 16.0,
@@ -524,20 +519,47 @@ class _CustomInputFieldState extends State<CustomInputField> {
     );
 
     if (!widget.obscure && widget.suffixWidget != null) {
+      // Base icon size on constraints.maxWidth for responsive suffix widgets
+      final baseSize = availableWidth * 0.05; // 5% of constraints.maxWidth
+      final suffixIconSize = ResponsiveHelper.value<double>(
+        data: data,
+        mobile: baseSize.clamp(16.0, 20.0),
+        // Clamp between 16-20px
+        tablet: baseSize.clamp(18.0, 22.0),
+        // Clamp between 18-22px
+        desktop: baseSize.clamp(20.0, 24.0),
+        // Clamp between 20-24px
+        ultraWide: baseSize.clamp(20.0, 26.0),
+        // Clamp between 20-26px
+        fallback: 18.0,
+      );
+
       return Padding(
-        padding: EdgeInsetsDirectional.only(end: horizontalPadding),
-        child: widget.suffixWidget,
+        padding: EdgeInsetsDirectional.only(
+          end: horizontalPadding + suffixPadding,
+        ),
+        child: SizedBox(
+          width: suffixIconSize,
+          height: suffixIconSize,
+          child: widget.suffixWidget,
+        ),
       );
     }
 
     if (widget.obscure) {
-      final eyeIconSize = ResponsiveHelper.responsiveIconSize(
+      // Base icon size on constraints.maxWidth (container width) for better proportions
+      final baseSize = availableWidth * 0.05; // 5% of constraints.maxWidth
+      final eyeIconSize = ResponsiveHelper.value<double>(
         data: data,
-        mobile: 18.0,
-        // Smaller, more reasonable
-        tablet: 20.0,
-        desktop: 22.0,
-        ultraWide: 22.0, // Don't go too big
+        mobile: baseSize.clamp(16.0, 20.0),
+        // Clamp between 16-20px
+        tablet: baseSize.clamp(18.0, 22.0),
+        // Clamp between 18-22px
+        desktop: baseSize.clamp(20.0, 24.0),
+        // Clamp between 20-24px
+        ultraWide: baseSize.clamp(20.0, 26.0),
+        // Clamp between 20-26px
+        fallback: 18.0,
       );
 
       return CommonInkWell(
@@ -560,7 +582,143 @@ class _CustomInputFieldState extends State<CustomInputField> {
     return null;
   }
 
+  /// Build title icon
+  Widget _buildTitleIcon(ResponsiveData data, double availableWidth) {
+    // Base icon size on constraints.maxWidth (container width) for better proportions
+    final baseSize = availableWidth * 0.06; // 6% of constraints.maxWidth
+    final size = ResponsiveHelper.value<double>(
+      data: data,
+      mobile: baseSize.clamp(18.0, 22.0),
+      tablet: baseSize.clamp(20.0, 24.0),
+      desktop: baseSize.clamp(22.0, 26.0),
+      ultraWide: baseSize.clamp(24.0, 28.0),
+      fallback: 20.0,
+    );
+
+    return Container(
+      width: size,
+      height: size,
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        color: AppColors.primaryColor,
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(size / 6),
+        child: SvgPicture.asset(
+          widget.titleIcon!,
+          colorFilter: const ColorFilter.mode(
+            AppColors.blackColor,
+            BlendMode.srcIn,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Toggle password visibility
   void _toggleObscureText() {
     setState(() => _obscureText = !_obscureText);
+  }
+}
+
+// ============================================================================
+// RESPONSIVE DIMENSIONS CALCULATOR
+// ============================================================================
+
+/// Calculates responsive dimensions for input field components
+class InputFieldDimensionsCalculator {
+  const InputFieldDimensionsCalculator._();
+
+  /// Calculate field width based on responsive constraints
+  static double calculateFieldWidth(
+    ResponsiveData data,
+    double availableWidth,
+  ) {
+    // For mobile screen OR mobile-sized container, use full available width
+    if (data.isMobileRange || availableWidth <= ResponsiveConfig.mobileLarge) {
+      return availableWidth;
+    }
+
+    // For tablet and desktop, use a percentage of the available container width
+    return ResponsiveHelper.value<double>(
+      data: data,
+      mobile: availableWidth,
+      mobileLarge: availableWidth * 0.95,
+      tablet: availableWidth * 0.85,
+      tabletLarge: availableWidth * 0.75,
+      desktop: availableWidth * 0.7,
+      desktopLarge: availableWidth * 0.65,
+      ultraWide: availableWidth * 0.65,
+      fallback: availableWidth,
+    );
+  }
+
+  /// Calculate icon size based on available width
+  static double calculateIconSize(
+    ResponsiveData data,
+    double availableWidth, {
+    required double basePercentage,
+    required double minSize,
+    required double maxSize,
+  }) {
+    final baseSize = availableWidth * basePercentage;
+    return ResponsiveHelper.value<double>(
+      data: data,
+      mobile: baseSize.clamp(minSize, maxSize),
+      tablet: baseSize.clamp(minSize + 2, maxSize + 2),
+      desktop: baseSize.clamp(minSize + 4, maxSize + 4),
+      ultraWide: baseSize.clamp(minSize + 6, maxSize + 6),
+      fallback: minSize,
+    );
+  }
+
+  /// Calculate icon constraints for prefix/suffix
+  static BoxConstraints calculateIconConstraints(
+    ResponsiveData data,
+    double availableWidth, {
+    required double heightPercentage,
+    required double widthPercentage,
+    required double minHeight,
+    required double maxHeight,
+    required double minWidth,
+    required double maxWidth,
+  }) {
+    final height = ResponsiveHelper.value<double>(
+      data: data,
+      mobile: (availableWidth * heightPercentage).clamp(minHeight, maxHeight),
+      tablet: (availableWidth * (heightPercentage - 0.02)).clamp(
+        minHeight + 4,
+        maxHeight + 4,
+      ),
+      desktop: (availableWidth * (heightPercentage - 0.04)).clamp(
+        minHeight + 8,
+        maxHeight + 8,
+      ),
+      ultraWide: (availableWidth * (heightPercentage - 0.05)).clamp(
+        minHeight + 8,
+        maxHeight + 10,
+      ),
+      fallback: minHeight,
+    );
+
+    final width = ResponsiveHelper.value<double>(
+      data: data,
+      mobile: (availableWidth * widthPercentage).clamp(minWidth, maxWidth),
+      tablet: (availableWidth * (widthPercentage - 0.03)).clamp(
+        minWidth + 4,
+        maxWidth + 5,
+      ),
+      desktop: (availableWidth * (widthPercentage - 0.05)).clamp(
+        minWidth + 8,
+        maxWidth + 10,
+      ),
+      ultraWide: (availableWidth * (widthPercentage - 0.07)).clamp(
+        minWidth + 8,
+        maxWidth + 15,
+      ),
+      fallback: minWidth,
+    );
+
+    return BoxConstraints(maxHeight: height, maxWidth: width);
   }
 }

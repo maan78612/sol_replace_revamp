@@ -17,14 +17,6 @@ class _LoginComponent extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(
-              height: ResponsiveHelper.responsiveSpacing(
-                data: data,
-                mobile: 20.0,
-                tablet: 24.0,
-                desktop: 28.0,
-              ),
-            ),
             CustomInputField(
               hint: 'Email',
               title: 'Enter your email.',
@@ -39,17 +31,11 @@ class _LoginComponent extends ConsumerWidget {
               ),
               suffixWidget: _getSuffixIcon(con: vm.emailCont, data: data),
             ),
-            SizedBox(
-              height: ResponsiveHelper.responsiveSpacing(
-                data: data,
-                mobile: 30.0,
-                tablet: 36.0,
-                desktop: 42.0,
-              ),
-            ),
+            30.verticalSpace,
             CustomInputField(
               title: 'Password',
               hint: 'Enter your password.',
+              titleIcon: AppIcons.lock,
               obscure: true,
               textInputAction: TextInputAction.done,
               controller: vm.passwordCont,
@@ -62,148 +48,89 @@ class _LoginComponent extends ConsumerWidget {
 
             GestureDetector(
               onTap: () {},
-              child: Padding(
-                padding: EdgeInsets.only(
-                  right: ResponsiveHelper.responsiveWidth(
-                    data: data,
-                    mobile: 4.0,
-                    tablet: 6.0,
-                    desktop: 8.0,
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: Padding(
+                  padding: EdgeInsets.all(
+                    ResponsiveHelper.responsiveWidth(
+                      data: data,
+                      mobile: 8.0,
+                      tablet: 10.0,
+                      desktop: 12.0,
+                    ),
                   ),
-                  top: ResponsiveHelper.responsiveHeight(
-                    data: data,
-                    mobile: 4.0,
-                    tablet: 6.0,
-                    desktop: 8.0,
-                  ),
-                  bottom: ResponsiveHelper.responsiveHeight(
-                    data: data,
-                    mobile: 4.0,
-                    tablet: 6.0,
-                    desktop: 8.0,
-                  ),
-                ),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: EdgeInsets.all(
-                      ResponsiveHelper.responsiveWidth(
+                  child: Text(
+                    "Forgot Password?",
+                    style: FontStyles.montserratRegular.copyWith(
+                      fontSize: ResponsiveHelper.adaptiveFontSize(
                         data: data,
-                        mobile: 8.0,
-                        tablet: 10.0,
-                        desktop: 12.0,
+                        baseSize: 12.0,
+                        scaleFactor: 0.95,
                       ),
-                    ),
-                    child: Text(
-                      "Forgot Password?",
-                      style: FontStyles.montserratRegular.copyWith(
-                        fontSize: ResponsiveHelper.adaptiveFontSize(
-                          data: data,
-                          baseSize: 12.0,
-                          scaleFactor: 0.95,
-                        ),
-                        color: AppColors.primaryColor,
-                        decoration: TextDecoration.underline,
-                      ),
+                      color: AppColors.primaryColor,
+                      decoration: TextDecoration.underline,
                     ),
                   ),
                 ),
               ),
             ),
-            SizedBox(
-              height: ResponsiveHelper.responsiveSpacing(
-                data: data,
-                mobile: 30.0,
-                tablet: 36.0,
-                desktop: 42.0,
-              ),
-            ),
+
             _guestText(data),
-            SizedBox(
-              height: ResponsiveHelper.responsiveSpacing(
-                data: data,
-                mobile: 10.0,
-                tablet: 12.0,
-                desktop: 14.0,
-              ),
-            ),
+            40.verticalSpace,
             CustomButton(
               title: 'LOGIN',
               onPressed: () => vm.loginUser(),
               bgColor: AppColors.primaryColor,
               textColor: AppColors.whiteColor,
             ),
-            SizedBox(
-              height: ResponsiveHelper.responsiveSpacing(
-                data: data,
-                mobile: 10.0,
-                tablet: 12.0,
-                desktop: 14.0,
-              ),
-            ),
+            30.verticalSpace,
           ],
         );
       },
     );
   }
 
-  Widget? _getSuffixIcon({required CustomTextController con, required ResponsiveData data}) {
+  Widget? _getSuffixIcon({
+    required CustomTextController con,
+    required ResponsiveData data,
+  }) {
     return (con.controller.text.isNotEmpty)
         ? Icon(
             con.error != null ? Icons.close : Icons.check,
             color: con.error != null
                 ? AppColors.redColor
                 : AppColors.primaryColor,
-            size: ResponsiveHelper.responsiveWidth(
-              data: data,
-              mobile: 18.0,
-              tablet: 20.0,
-              desktop: 22.0,
-            ),
           )
         : null;
   }
 
   Widget _guestText(ResponsiveData data) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Padding(
-        padding: EdgeInsets.all(
-          ResponsiveHelper.responsiveWidth(
+    return RichText(
+      textAlign: TextAlign.center,
+      text: TextSpan(
+        text: "To continue as a Guest. ",
+        style: FontStyles.montserratRegular.copyWith(
+          fontSize: ResponsiveHelper.adaptiveFontSize(
             data: data,
-            mobile: 8.0,
-            tablet: 10.0,
-            desktop: 12.0,
+            baseSize: 14.0,
+            scaleFactor: 0.95,
           ),
+          color: AppColors.blackColor,
         ),
-        child: RichText(
-          textAlign: TextAlign.center,
-          text: TextSpan(
-            text: "To continue as a Guest. ",
+        children: <TextSpan>[
+          TextSpan(
+            text: 'Click Here',
             style: FontStyles.montserratRegular.copyWith(
               fontSize: ResponsiveHelper.adaptiveFontSize(
                 data: data,
                 baseSize: 14.0,
                 scaleFactor: 0.95,
               ),
-              color: AppColors.blackColor,
+              color: AppColors.primaryColor,
             ),
-            children: <TextSpan>[
-              TextSpan(
-                text: 'Click Here',
-                style: FontStyles.montserratRegular.copyWith(
-                  fontSize: ResponsiveHelper.adaptiveFontSize(
-                    data: data,
-                    baseSize: 14.0,
-                    scaleFactor: 0.95,
-                  ),
-                  color: AppColors.primaryColor,
-                ),
-                recognizer: TapGestureRecognizer()..onTap = () async {},
-              ),
-            ],
+            recognizer: TapGestureRecognizer()..onTap = () async {},
           ),
-        ),
+        ],
       ),
     );
   }

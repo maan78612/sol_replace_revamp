@@ -11,13 +11,10 @@ class AuthView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final vm = ref.watch(_authVmProvider);
 
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
-      child: Scaffold(
-        backgroundColor: AppColors.whiteColor,
-        body: ResponsiveWidget(
-          builder: (context, data) => _buildResponsiveLayout(context, data, vm),
-        ),
+    return Scaffold(
+      backgroundColor: AppColors.whiteColor,
+      body: ResponsiveWidget(
+        builder: (context, data) => _buildResponsiveLayout(context, data, vm),
       ),
     );
   }
@@ -49,43 +46,48 @@ class AuthView extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Top spacing
-          SizedBox(
-            height: ResponsiveHelper.responsiveSpacing(
-              data: data,
-              mobile: 40.0,
-              tablet: 48.0,
-              desktop: 56.0,
-            ),
-          ),
-
-          // Auth type switcher
+          40.verticalSpace,
           _Switcher(_authVmProvider),
-
-          // Main auth card
           _buildAuthCard(context, data, vm),
-
-          // Spacing before social auth
-          SizedBox(
-            height: ResponsiveHelper.responsiveSpacing(
-              data: data,
-              mobile: 30.0,
-              tablet: 36.0,
-              desktop: 42.0,
-            ),
-          ),
-
-          // Social authentication
+          30.verticalSpace,
           _SocialAuth(_authVmProvider),
+          20.verticalSpace,
+          _buildTermsText(data,vm),
+          40.verticalSpace,
+        ],
+      ),
+    );
+  }
 
-          // Bottom spacing
-          SizedBox(
-            height: ResponsiveHelper.responsiveSpacing(
-              data: data,
-              mobile: 30.0,
-              tablet: 36.0,
-              desktop: 42.0,
+  Widget _buildTermsText(ResponsiveData data,_AuthVm vm) {
+    final fontSize = ResponsiveHelper.adaptiveFontSize(
+      data: data,
+      baseSize: 14.0,
+      scaleFactor: 0.95,
+    );
+
+    return RichText(
+      textAlign: TextAlign.center,
+      text: TextSpan(
+        text: "By ${vm.authScreenType == AuthType.login ? "login" : "signup"} in you are agreeing our\n",
+        style: FontStyles.montserratRegular.copyWith(
+          fontSize: fontSize,
+          color: AppColors.blackColor,
+          height: 1.6.h,
+        ),
+        children: <TextSpan>[
+          TextSpan(
+            text: 'Term and privacy policy',
+            style: FontStyles.montserratRegular.copyWith(
+              fontSize: fontSize,
+              color: AppColors.primaryColor,
+              decoration: TextDecoration.underline,
+              decorationColor: AppColors.primaryColor,
             ),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () {
+                // Handle terms and privacy policy tap
+              },
           ),
         ],
       ),
@@ -201,31 +203,17 @@ class AuthView extends ConsumerWidget {
       child: SizedBox(
         height: data.height,
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: hMargin),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Top spacing
-              SizedBox(
-                height: ResponsiveHelper.responsiveSpacing(
-                  data: data,
-                  mobile: 60.0,
-                  tablet: 72.0,
-                  desktop: 84.0,
-                ),
-              ),
-
-              // Auth type switcher
+              40.verticalSpace,
               _Switcher(_authVmProvider),
-
-              // Main auth card
               _buildAuthCard(context, data, vm),
-
               30.verticalSpace,
-
-              // Social authentication
               _SocialAuth(_authVmProvider),
+              20.verticalSpace,
+              _buildTermsText(data,vm),
               30.verticalSpace,
             ],
           ),
@@ -243,83 +231,13 @@ class AuthView extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Top spacing
-          SizedBox(
-            height: ResponsiveHelper.responsiveSpacing(
-              data: data,
-              mobile: 20.0,
-              tablet: 24.0,
-              desktop: 28.0,
-            ),
-          ),
+          30.verticalSpace,
 
-          // Title
-          _buildTitle(data, vm),
-
-          10.verticalSpace,
-
-          // Terms and privacy text
-          _buildTermsText(data),
-
-          // Spacing before form
-          20.verticalSpace,
-
-          // Auth form component
+          40.verticalSpace,
           vm.authScreenType == AuthType.login
               ? _LoginComponent()
               : _SignUpComponent(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTitle(ResponsiveData data, _AuthVm vm) {
-    final fontSize = ResponsiveHelper.adaptiveFontSize(
-      data: data,
-      baseSize: 24.0,
-      scaleFactor: 1.0,
-    );
-
-    return Text(
-      vm.authScreenType == AuthType.login ? "Login" : "Sign Up",
-      style: FontStyles.montserratBold.copyWith(
-        fontSize: fontSize,
-        color: AppColors.blackColor,
-      ),
-      textAlign: TextAlign.center,
-    );
-  }
-
-  Widget _buildTermsText(ResponsiveData data) {
-    final fontSize = ResponsiveHelper.adaptiveFontSize(
-      data: data,
-      baseSize: 14.0,
-      scaleFactor: 0.95,
-    );
-
-    return RichText(
-      textAlign: TextAlign.center,
-      text: TextSpan(
-        text: "By login in you are agreeing our\n",
-        style: FontStyles.montserratRegular.copyWith(
-          fontSize: fontSize,
-          color: AppColors.blackColor,
-          height: 1.4,
-        ),
-        children: <TextSpan>[
-          TextSpan(
-            text: 'Term and privacy policy',
-            style: FontStyles.montserratRegular.copyWith(
-              fontSize: fontSize,
-              color: AppColors.primaryColor,
-              decoration: TextDecoration.underline,
-              decorationColor: AppColors.primaryColor,
-            ),
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                // Handle terms and privacy policy tap
-              },
-          ),
+          10.verticalSpace,
         ],
       ),
     );

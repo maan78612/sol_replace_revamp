@@ -57,13 +57,6 @@ class _SocialAuth extends ConsumerWidget {
   }
 
   Widget _socialLoginButtons(_AuthVm vm, ResponsiveData data) {
-    final spacing = ResponsiveHelper.responsiveWidth(
-      data: data,
-      mobile: 15.0,
-      tablet: 18.0,
-      desktop: 21.0,
-    );
-
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -75,7 +68,7 @@ class _SocialAuth extends ConsumerWidget {
           },
           data: data,
         ),
-        SizedBox(width: spacing),
+        20.horizontalSpace,
         _buildSocialButton(
           imagePath: AppIcons.gmail,
           onTap: () {
@@ -83,14 +76,14 @@ class _SocialAuth extends ConsumerWidget {
           },
           data: data,
         ),
-        // if (Platform.isIOS) ...[
-        //   SizedBox(width: spacing),
-        //   _buildSocialButton(
-        //     imagePath: AppImages.apple,
-        //     onTap: () {},
-        //     data: data,
-        //   ),
-        // ],
+        if (Platform.isMacOS || Platform.isIOS) ...[
+          20.horizontalSpace,
+          _buildSocialButton(
+            imagePath: AppIcons.apple,
+            onTap: () {},
+            data: data,
+          ),
+        ],
       ],
     );
   }
@@ -100,44 +93,21 @@ class _SocialAuth extends ConsumerWidget {
     required VoidCallback onTap,
     required ResponsiveData data,
   }) {
-    final buttonSize = ResponsiveHelper.responsiveWidth(
-      data: data,
-      mobile: 48.0,
-      tablet: 52.0,
-      desktop: 56.0,
-      ultraWide: 60.0,
-    );
-
-    final iconSize = ResponsiveHelper.responsiveWidth(
-      data: data,
-      mobile: 27.0,
-      tablet: 30.0,
-      desktop: 33.0,
-      ultraWide: 36.0,
-    );
-
-    final borderRadius = ResponsiveHelper.responsiveRadius(
-      data: data,
-      mobile: 10.0,
-      tablet: 12.0,
-      desktop: 14.0,
-      ultraWide: 16.0,
-    );
+    final size = 55.0;
 
     return CommonInkWell(
-      onTap:()=> onTap(),
+      onTap: () => onTap(),
       child: Container(
-        height: buttonSize,
-        width: buttonSize,
+        constraints: BoxConstraints(maxHeight: size, maxWidth: size),
+        padding: EdgeInsets.all(3),
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.lightGreyColor),
-          borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
+          borderRadius: BorderRadius.all(Radius.circular(10.r)),
         ),
         child: Center(
           child: SvgPicture.asset(
             imagePath,
-            height: iconSize,
-            width: iconSize,
+
             fit: BoxFit.contain,
             // Remove any color filters that might hide the icons
           ),
