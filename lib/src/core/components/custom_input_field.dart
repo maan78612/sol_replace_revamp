@@ -634,18 +634,13 @@ class InputFieldDimensionsCalculator {
     ResponsiveData data,
     double availableWidth,
   ) {
-    // For mobile screen OR mobile-sized container, use full available width
-    if (data.isMobileRange || availableWidth <= ResponsiveConfig.mobileLarge) {
-      return availableWidth;
-    }
-
     // For tablet and desktop, use a percentage of the available container width
     return ResponsiveHelper.value<double>(
       data: data,
       mobile: availableWidth,
-      mobileLarge: availableWidth * 0.95,
-      tablet: availableWidth * 0.85,
-      tabletLarge: availableWidth * 0.75,
+      mobileLarge: availableWidth * 0.8,
+      tablet: availableWidth * 0.65,
+      tabletLarge: availableWidth * 0.6,
       desktop: availableWidth * 0.7,
       desktopLarge: availableWidth * 0.65,
       ultraWide: availableWidth * 0.65,

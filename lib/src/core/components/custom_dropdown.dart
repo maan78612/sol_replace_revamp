@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:sol_replace_revamp/src/core/constants/colors.dart';
 import 'package:sol_replace_revamp/src/core/constants/fonts.dart';
 import 'package:sol_replace_revamp/src/core/constants/icons.dart';
+import 'package:sol_replace_revamp/src/core/utilities/responsive_helper.dart';
 
 class CustomDropdown<T> extends StatefulWidget {
   final T value;
@@ -49,9 +50,10 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      key: _dropdownKey,
-      onTap: () async {
+    return ResponsiveWidget(
+      builder: (context, data) => GestureDetector(
+        key: _dropdownKey,
+        onTap: () async {
         setState(() => _isDropdownOpen = true);
         final RenderBox renderBox =
             _dropdownKey.currentContext!.findRenderObject() as RenderBox;
@@ -64,7 +66,13 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
           constraints: BoxConstraints(
             minWidth: fieldWidth,
             maxWidth: fieldWidth,
-            maxHeight: widget.maxDropdownHeight ?? 0.5.sh,
+            maxHeight: widget.maxDropdownHeight ?? 
+                ResponsiveHelper.responsiveHeight(
+                  data: data,
+                  mobile: data.height * 0.4,
+                  tablet: data.height * 0.45,
+                  desktop: data.height * 0.5,
+                ),
           ),
           position: RelativeRect.fromLTRB(
             offset.dx,
@@ -74,20 +82,46 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(widget.borderRadius ?? 12.r),
-              bottomRight: Radius.circular(widget.borderRadius ?? 12.r),
+              bottomLeft: Radius.circular(
+                widget.borderRadius ?? 
+                ResponsiveHelper.responsiveRadius(
+                  data: data,
+                  mobile: 10.0,
+                  tablet: 12.0,
+                  desktop: 14.0,
+                ),
+              ),
+              bottomRight: Radius.circular(
+                widget.borderRadius ?? 
+                ResponsiveHelper.responsiveRadius(
+                  data: data,
+                  mobile: 10.0,
+                  tablet: 12.0,
+                  desktop: 14.0,
+                ),
+              ),
             ),
           ),
           color: widget.backgroundColor ?? AppColors.blackColor,
           items: widget.options.map((option) {
             return PopupMenuItem<T>(
               value: option,
-              height: widget.height ?? 40.h,
+              height: widget.height ?? 
+                ResponsiveHelper.responsiveHeight(
+                  data: data,
+                  mobile: 36.0,
+                  tablet: 40.0,
+                  desktop: 44.0,
+                ),
               child: Text(
                 _getItemString(option),
                 style: FontStyles.montserratRegular.copyWith(
                   color: widget.textColor ?? AppColors.whiteColor,
-                  fontSize: 14.sp,
+                  fontSize: ResponsiveHelper.adaptiveFontSize(
+                    data: data,
+                    baseSize: 14.0,
+                    scaleFactor: 0.9,
+                  ),
                 ),
               ),
             );
@@ -105,17 +139,53 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
         curve: Curves.easeInOut,
         width: widget.width,
         height: widget.height,
-        padding:
-            widget.padding ??
-            EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        padding: widget.padding ??
+            EdgeInsets.symmetric(
+              horizontal: ResponsiveHelper.responsiveSpacing(
+                data: data,
+                mobile: 12.0,
+                tablet: 16.0,
+                desktop: 20.0,
+              ),
+              vertical: ResponsiveHelper.responsiveSpacing(
+                data: data,
+                mobile: 10.0,
+                tablet: 12.0,
+                desktop: 14.0,
+              ),
+            ),
         decoration: BoxDecoration(
           color: widget.backgroundColor ?? AppColors.blackColor,
           borderRadius: _isDropdownOpen
               ? BorderRadius.only(
-                  topRight: Radius.circular(widget.borderRadius ?? 12.r),
-                  topLeft: Radius.circular(widget.borderRadius ?? 12.r),
+                  topRight: Radius.circular(
+                    widget.borderRadius ?? 
+                    ResponsiveHelper.responsiveRadius(
+                      data: data,
+                      mobile: 10.0,
+                      tablet: 12.0,
+                      desktop: 14.0,
+                    ),
+                  ),
+                  topLeft: Radius.circular(
+                    widget.borderRadius ?? 
+                    ResponsiveHelper.responsiveRadius(
+                      data: data,
+                      mobile: 10.0,
+                      tablet: 12.0,
+                      desktop: 14.0,
+                    ),
+                  ),
                 )
-              : BorderRadius.circular(widget.borderRadius ?? 12.r),
+              : BorderRadius.circular(
+                  widget.borderRadius ?? 
+                  ResponsiveHelper.responsiveRadius(
+                    data: data,
+                    mobile: 10.0,
+                    tablet: 12.0,
+                    desktop: 14.0,
+                  ),
+                ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -125,23 +195,41 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
                 _getItemString(widget.value),
                 style: FontStyles.montserratRegular.copyWith(
                   color: widget.textColor ?? AppColors.whiteColor,
-                  fontSize: 14.sp,
+                  fontSize: ResponsiveHelper.adaptiveFontSize(
+                    data: data,
+                    baseSize: 14.0,
+                    scaleFactor: 0.9,
+                  ),
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
             if (widget.showIcon) ...[
-              8.horizontalSpace,
+              SizedBox(
+                width: ResponsiveHelper.responsiveSpacing(
+                  data: data,
+                  mobile: 6.0,
+                  tablet: 8.0,
+                  desktop: 10.0,
+                ),
+              ),
               AnimatedRotation(
-                duration:
-                    widget.animationDuration ??
+                duration: widget.animationDuration ??
                     const Duration(milliseconds: 200),
                 turns: _isDropdownOpen ? 0 : 0.5,
-                child: Icon(Icons.keyboard_arrow_up),
+                child: Icon(
+                  Icons.keyboard_arrow_up,
+                  color: widget.iconColor ?? AppColors.whiteColor,
+                  size: ResponsiveHelper.adaptiveIconSize(
+                    data: data,
+                    baseSize: 20.0,
+                  ),
+                ),
               ),
             ],
           ],
         ),
+      ),
       ),
     );
   }

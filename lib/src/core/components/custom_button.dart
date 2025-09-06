@@ -2,6 +2,7 @@ import 'package:sol_replace_revamp/src/core/globals/variables.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sol_replace_revamp/src/core/components/custom_inkwell.dart';
+import 'package:sol_replace_revamp/src/core/components/custom_input_field.dart';
 import 'package:sol_replace_revamp/src/core/constants/colors.dart';
 import 'package:sol_replace_revamp/src/core/constants/fonts.dart';
 import 'package:sol_replace_revamp/src/core/utilities/responsive_helper.dart';
@@ -46,114 +47,95 @@ class CustomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ResponsiveWidget(
       builder: (context, data) {
-        return CommonInkWell(
-          onTap: isEnable ? onPressed : null,
-          child: Container(
-            width: width ?? _getResponsiveWidth(data),
-            height: height ?? _getResponsiveHeight(data),
-            alignment: Alignment.center,
-            // Centers child both vertically and horizontally
-            decoration: BoxDecoration(
-              border: isEnable ? Border.all(color: borderColor ?? bgColor) : null,
-              borderRadius: BorderRadius.circular(
-                ResponsiveHelper.responsiveRadius(
-                  data: data,
-                  mobile: 35.0,
-                  tablet: 38.0,
-                  desktop: 40.0,
-                ),
-              ),
-              color: (disableBgColor == null)
-                  ? bgColor.withAlpha(isEnable ? 255 : 127)
-                  : isEnable
-                  ? bgColor
-                  : disableBgColor,
-            ),
-            child: isLoading
-                ? Container(
-                    height: _getResponsiveLoadingSize(data),
-                    width: _getResponsiveLoadingSize(data),
-                    alignment: Alignment.center,
-                    margin: EdgeInsets.symmetric(
-                      vertical: ResponsiveHelper.responsiveSpacing(
-                        data: data,
-                        mobile: 6.0,
-                        tablet: 7.0,
-                        desktop: 8.0,
-                      ),
-                    ),
-                    child: CircularProgressIndicator(
-                      strokeWidth: ResponsiveHelper.value<double>(
-                        data: data,
-                        mobile: 3.0,
-                        tablet: 3.5,
-                        desktop: 4.0,
-                        fallback: 3.0,
-                      ),
-                      valueColor: AlwaysStoppedAnimation<Color>(loadingColor),
-                    ),
-                  )
-                : Row(
-                    mainAxisSize: MainAxisSize.min,
-                    // Critical fix: Shrink row to content width
-                    children: [
-                      if (icon != null) icon!,
-                      if (icon != null && title != null) 
-                        SizedBox(
-                          width: ResponsiveHelper.responsiveSpacing(
-                            data: data,
-                            mobile: 8.0,
-                            tablet: 10.0,
-                            desktop: 12.0,
-                          ),
-                        ),
-                      if (title != null)
-                        Text(
-                          title!,
-                          textAlign: TextAlign.center,
-                          style: textStyle ??
-                              FontStyles.montserratBold.copyWith(
-                                color: textColor,
-                                fontSize: fontSize ?? 
-                                    ResponsiveHelper.adaptiveFontSize(
-                                      data: data,
-                                      baseSize: 14.0,
-                                      scaleFactor: 1.0,
-                                    ),
-                                height: 1,
-                              ),
-                        ),
-                    ],
-                  ),
-          ),
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final adaptiveWidth =
+                width ?? _getMaxFieldWidth(data, constraints.maxWidth);
+
+            return ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: adaptiveWidth),
+              child: _buildButton(data, adaptiveWidth),
+            );
+          },
         );
       },
     );
   }
 
-  /// Get responsive width for button
-  double _getResponsiveWidth(ResponsiveData data) {
-    // Use similar constraints as CustomInputField for consistency
-    return ResponsiveHelper.value<double>(
-      data: data,
-      mobile: data.width, // Full width on mobile
-      mobileLarge: data.width * 0.95,
-      tablet: 500.0, // Fixed max width for tablet
-      tabletLarge: 550.0,
-      desktop: 400.0, // Smaller max width for desktop
-      desktopLarge: 450.0,
-      ultraWide: 500.0, // Reasonable width for ultra-wide
-      fallback: data.width,
+  Widget _buildButton(ResponsiveData data, double buttonWidth) {
+    return CommonInkWell(
+      onTap: isEnable ? onPressed : null,
+      child: Container(
+        width: buttonWidth,
+        height: height ?? inputFieldHeight,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          border: isEnable ? Border.all(color: borderColor ?? bgColor) : null,
+          borderRadius: BorderRadius.circular(50.r),
+          color: (disableBgColor == null)
+              ? bgColor.withAlpha(isEnable ? 255 : 127)
+              : isEnable
+              ? bgColor
+              : disableBgColor,
+        ),
+        child: isLoading
+            ? Container(
+                height: _getResponsiveLoadingSize(data),
+                width: _getResponsiveLoadingSize(data),
+                alignment: Alignment.center,
+                margin: EdgeInsets.symmetric(vertical: 4.h),
+                child: CircularProgressIndicator(
+                  strokeWidth: ResponsiveHelper.value<double>(
+                    data: data,
+                    mobile: 3.0,
+                    tablet: 3.5,
+                    desktop: 4.0,
+                    fallback: 3.0,
+                  ),
+                  valueColor: AlwaysStoppedAnimation<Color>(loadingColor),
+                ),
+              )
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                // Critical fix: Shrink row to content width
+                children: [
+                  if (icon != null) icon!,
+                  if (icon != null && title != null) 5.horizontalSpace,
+                  if (title != null)
+                    Text(
+                      title!,
+                      textAlign: TextAlign.center,
+                      style:
+                          textStyle ??
+                          FontStyles.montserratSemiBold.copyWith(
+                            color: textColor,
+                            fontSize:
+                                fontSize ??
+                                ResponsiveHelper.adaptiveFontSize(
+                                  data: data,
+                                  baseSize: 14.0,
+                                  scaleFactor: 0.8,
+                                ),
+                            height: 1,
+                          ),
+                    ),
+                ],
+              ),
+      ),
     );
   }
 
-  /// Get responsive height for button
-  double _getResponsiveHeight(ResponsiveData data) {
-    return ResponsiveHelper.responsiveHeight(
+  double _getMaxFieldWidth(ResponsiveData data, double availableWidth) {
+    return ResponsiveHelper.value<double>(
       data: data,
-      mobile: inputFieldHeight,
-      tablet: inputFieldHeight * 1.1,
-      desktop: inputFieldHeight * 1.15,
+      mobile: data.width * 0.5,
+      mobileLarge: data.width * 0.5,
+      tablet: data.width * 0.4,
+      tabletLarge: data.width * 0.4,
+      desktop: data.width * 0.2,
+      desktopLarge: data.width * 0.2,
+      ultraWide: data.width * 0.2,
+      fallback: availableWidth,
     );
   }
 

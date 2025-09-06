@@ -28,20 +28,43 @@ class _InputView extends StatefulWidget {
 class _InputViewState extends State<_InputView> {
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 200.h,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          10.verticalSpace,
+    return ResponsiveWidget(
+      builder: (context, data) => SizedBox(
+        height: ResponsiveHelper.responsiveHeight(
+          data: data,
+          mobile: 180.0,
+          tablet: 200.0,
+          desktop: 220.0,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              height: ResponsiveHelper.responsiveSpacing(
+                data: data,
+                mobile: 8.0,
+                tablet: 10.0,
+                desktop: 12.0,
+              ),
+            ),
           CustomInputField(
             controller: widget.textController,
             hint: widget.fieldHintText ?? 'dd/mm/yyyy',
             label: widget.fieldLabelText ?? 'Enter date',
             suffixWidget: widget.suffixWidget,
             errorPadding: EdgeInsets.symmetric(
-              vertical: 8.sp,
-              horizontal: 10.sp,
+              vertical: ResponsiveHelper.responsiveSpacing(
+                data: data,
+                mobile: 6.0,
+                tablet: 8.0,
+                desktop: 10.0,
+              ),
+              horizontal: ResponsiveHelper.responsiveSpacing(
+                data: data,
+                mobile: 8.0,
+                tablet: 10.0,
+                desktop: 12.0,
+              ),
             ),
             inputFormatters: [
               _DateInputFormatter(),
@@ -51,23 +74,65 @@ class _InputViewState extends State<_InputView> {
               _parseAndSetDate(value);
             },
           ),
-          10.verticalSpace,
-          if (widget.textController.error != null) ...[_buildErrorText()],
-          30.verticalSpace,
+          SizedBox(
+            height: ResponsiveHelper.responsiveSpacing(
+              data: data,
+              mobile: 8.0,
+              tablet: 10.0,
+              desktop: 12.0,
+            ),
+          ),
+          if (widget.textController.error != null) ...[_buildErrorText(data)],
+          SizedBox(
+            height: ResponsiveHelper.responsiveSpacing(
+              data: data,
+              mobile: 24.0,
+              tablet: 30.0,
+              desktop: 36.0,
+            ),
+          ),
         ],
+      ),
       ),
     );
   }
 
-  Widget _buildErrorText() {
+  Widget _buildErrorText(ResponsiveData data) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
-      margin: EdgeInsets.only(top: 8.h),
+      padding: EdgeInsets.symmetric(
+        vertical: ResponsiveHelper.responsiveSpacing(
+          data: data,
+          mobile: 6.0,
+          tablet: 8.0,
+          desktop: 10.0,
+        ),
+        horizontal: ResponsiveHelper.responsiveSpacing(
+          data: data,
+          mobile: 10.0,
+          tablet: 12.0,
+          desktop: 14.0,
+        ),
+      ),
+      margin: EdgeInsets.only(
+        top: ResponsiveHelper.responsiveSpacing(
+          data: data,
+          mobile: 6.0,
+          tablet: 8.0,
+          desktop: 10.0,
+        ),
+      ),
       decoration: BoxDecoration(
-        color: AppColors.redColor.withValues(alpha:0.1),
-        borderRadius: BorderRadius.circular(6.r),
-        border: Border.all(color: AppColors.redColor.withValues(alpha:0.3)),
+        color: AppColors.redColor.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(
+          ResponsiveHelper.responsiveRadius(
+            data: data,
+            mobile: 6.0,
+            tablet: 8.0,
+            desktop: 10.0,
+          ),
+        ),
+        border: Border.all(color: AppColors.redColor.withValues(alpha: 0.3)),
       ),
       child: Text(
         widget.textController.error ?? "",
@@ -75,7 +140,11 @@ class _InputViewState extends State<_InputView> {
         textAlign: TextAlign.start,
         overflow: TextOverflow.ellipsis,
         style: FontStyles.montserratRegular.copyWith(
-          fontSize: 12.sp,
+          fontSize: ResponsiveHelper.adaptiveFontSize(
+            data: data,
+            baseSize: 12.0,
+            scaleFactor: 0.9,
+          ),
           color: AppColors.redColor,
         ),
       ),

@@ -52,14 +52,14 @@ class AuthView extends ConsumerWidget {
           30.verticalSpace,
           _SocialAuth(_authVmProvider),
           20.verticalSpace,
-          _buildTermsText(data,vm),
+          _buildTermsText(data, vm),
           40.verticalSpace,
         ],
       ),
     );
   }
 
-  Widget _buildTermsText(ResponsiveData data,_AuthVm vm) {
+  Widget _buildTermsText(ResponsiveData data, _AuthVm vm) {
     final fontSize = ResponsiveHelper.adaptiveFontSize(
       data: data,
       baseSize: 14.0,
@@ -69,7 +69,8 @@ class AuthView extends ConsumerWidget {
     return RichText(
       textAlign: TextAlign.center,
       text: TextSpan(
-        text: "By ${vm.authScreenType == AuthType.login ? "login" : "signup"} in you are agreeing our\n",
+        text:
+            "By ${vm.authScreenType == AuthType.login ? "login" : "signup"} in you are agreeing our\n",
         style: FontStyles.montserratRegular.copyWith(
           fontSize: fontSize,
           color: AppColors.blackColor,
@@ -213,7 +214,7 @@ class AuthView extends ConsumerWidget {
               30.verticalSpace,
               _SocialAuth(_authVmProvider),
               20.verticalSpace,
-              _buildTermsText(data,vm),
+              _buildTermsText(data, vm),
               30.verticalSpace,
             ],
           ),
@@ -223,23 +224,16 @@ class AuthView extends ConsumerWidget {
   }
 
   Widget _buildAuthCard(BuildContext context, ResponsiveData data, _AuthVm vm) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxWidth: ResponsiveHelper.maxContentWidth(data),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          30.verticalSpace,
-
-          40.verticalSpace,
-          vm.authScreenType == AuthType.login
-              ? _LoginComponent()
-              : _SignUpComponent(),
-          10.verticalSpace,
-        ],
-      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        40.verticalSpace,
+        vm.authScreenType == AuthType.login
+            ? _LoginComponent()
+            : _SignUpComponent(),
+        10.verticalSpace,
+      ],
     );
   }
 }

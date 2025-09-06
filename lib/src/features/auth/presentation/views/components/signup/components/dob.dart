@@ -11,7 +11,7 @@ class _DOBPicker extends ConsumerWidget {
     return ResponsiveWidget(
       builder: (context, data) {
         return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             CommonInkWell(
               onTap: () async {
@@ -20,7 +20,6 @@ class _DOBPicker extends ConsumerWidget {
                     firstDate: DateTime(1920),
                     lastDate: DateTime.now(),
                     fieldHintText: 'dd/mm/yyyy',
-                    // Explicitly set hint text format
                     fieldLabelText: 'Enter date (dd/mm/yyyy)',
                     suffixWidget: _suffixIcon(),
                     onDateSelected: (date) {
@@ -32,7 +31,7 @@ class _DOBPicker extends ConsumerWidget {
               child: CustomInputField(
                 title: 'Enter your birthday',
                 titleIcon: AppIcons.calendar,
-                hint: '"DD / MM / YYYY',
+                hint: 'DD / MM / YYYY',
                 enabled: false,
                 textInputAction: TextInputAction.next,
                 controller: controller,
@@ -43,63 +42,69 @@ class _DOBPicker extends ConsumerWidget {
                     baseSize: 14.0,
                     scaleFactor: 1.0,
                   ),
-                  color: AppColors.whiteColor,
+                  color: AppColors.blackColor,
                 ),
               ),
             ),
-            SizedBox(
-              height: ResponsiveHelper.responsiveSpacing(
-                data: data,
-                mobile: 12.0,
-                tablet: 14.0,
-                desktop: 16.0,
-              ),
-            ),
-            Text.rich(
-              textAlign: TextAlign.start,
-              softWrap: true,
-              TextSpan(
-                children: [
-                  WidgetSpan(
-                    child: SvgPicture.asset(
-                      AppIcons.alert,
-                      width: ResponsiveHelper.responsiveIconSize(
-                        data: data,
-                        mobile: 24.0,
-                        tablet: 26.0,
-                        desktop: 28.0,
-                      ),
-                      height: ResponsiveHelper.responsiveIconSize(
-                        data: data,
-                        mobile: 24.0,
-                        tablet: 26.0,
-                        desktop: 28.0,
+            12.verticalSpace,
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final fieldWidth =
+                    InputFieldDimensionsCalculator.calculateFieldWidth(
+                      data,
+                      constraints.maxWidth,
+                    );
+
+                return ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: fieldWidth),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text.rich(
+                      textAlign: TextAlign.start,
+                      softWrap: true,
+                      TextSpan(
+                        children: [
+                          WidgetSpan(
+                            child: SvgPicture.asset(
+                              AppIcons.alert,
+                              width: ResponsiveHelper.adaptiveFontSize(
+                                data: data,
+                                baseSize: 14.0,
+                              ),
+                              height: ResponsiveHelper.adaptiveIconSize(
+                                data: data,
+                                baseSize: 14.0,
+                              ),
+                            ),
+                          ),
+                          WidgetSpan(
+                            child: SizedBox(
+                              width: ResponsiveHelper.responsiveSpacing(
+                                data: data,
+                                mobile: 12.0,
+                                tablet: 14.0,
+                                desktop: 16.0,
+                              ),
+                            ),
+                          ),
+                          TextSpan(
+                            text:
+                                'You must be at least 18 years old to register',
+                            style: FontStyles.montserratRegular.copyWith(
+                              fontSize: ResponsiveHelper.adaptiveFontSize(
+                                data: data,
+                                baseSize: 14.0,
+                                scaleFactor: 0.7,
+                              ),
+                              color: AppColors.blackColor,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  WidgetSpan(
-                    child: SizedBox(
-                      width: ResponsiveHelper.responsiveSpacing(
-                        data: data,
-                        mobile: 12.0,
-                        tablet: 14.0,
-                        desktop: 16.0,
-                      ),
-                    ),
-                  ),
-                  TextSpan(
-                    text: 'You must be at least 18 years old to register',
-                    style: FontStyles.montserratRegular.copyWith(
-                      fontSize: ResponsiveHelper.adaptiveFontSize(
-                        data: data,
-                        baseSize: 14.0,
-                        scaleFactor: 0.95,
-                      ),
-                      color: AppColors.whiteColor,
-                    ),
-                  ),
-                ],
-              ),
+                );
+              },
             ),
           ],
         );

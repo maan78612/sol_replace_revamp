@@ -24,7 +24,6 @@ class _CalendarViewState extends State<_CalendarView> {
   @override
   void initState() {
     super.initState();
-    // Initialize with selected date's month if available
     if (widget.selectedDate != null) {
       _currentMonth = DateTime(
         widget.selectedDate!.year,
@@ -37,10 +36,10 @@ class _CalendarViewState extends State<_CalendarView> {
   void didUpdateWidget(_CalendarView oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Update current month when selected date changes (e.g., from input view)
-    if (widget.selectedDate != null && 
-        (oldWidget.selectedDate == null || 
-         oldWidget.selectedDate!.year != widget.selectedDate!.year ||
-         oldWidget.selectedDate!.month != widget.selectedDate!.month)) {
+    if (widget.selectedDate != null &&
+        (oldWidget.selectedDate == null ||
+            oldWidget.selectedDate!.year != widget.selectedDate!.year ||
+            oldWidget.selectedDate!.month != widget.selectedDate!.month)) {
       setState(() {
         _currentMonth = DateTime(
           widget.selectedDate!.year,
@@ -52,103 +51,165 @@ class _CalendarViewState extends State<_CalendarView> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 370.h,
-      child: Column(
-        children: [
-          // Month/Year Header with separate dropdowns
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              CommonInkWell(
-                onTap: () {
-                  setState(() {
-                    _currentMonth = DateTime(
-                      _currentMonth.year,
-                      _currentMonth.month - 1,
-                    );
-                  });
-                },
-                child: Icon(Icons.chevron_left, color: AppColors.whiteColor),
-              ),
-              Expanded(
-                flex: 3,
-                child: CustomDropdown<int>(
-                  value: _currentMonth.month,
-                  options: List.generate(12, (index) => index + 1),
-                  onChanged: (month) {
+    return ResponsiveWidget(
+      builder: (context, data) => SizedBox(
+        height: ResponsiveHelper.responsiveHeight(
+          data: data,
+          mobile: 350.0,
+          tablet: 370.0,
+          desktop: 400.0,
+        ),
+        child: Column(
+          children: [
+            // Month/Year Header with separate dropdowns
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                CommonInkWell(
+                  onTap: () {
                     setState(() {
-                      _currentMonth = DateTime(_currentMonth.year, month);
+                      _currentMonth = DateTime(
+                        _currentMonth.year,
+                        _currentMonth.month - 1,
+                      );
                     });
                   },
-                  itemToString: (month) => _getMonthName(month),
-                  backgroundColor: AppColors.blackColor,
-                  textColor: AppColors.whiteColor,
-                  iconColor: AppColors.whiteColor,
-                  borderRadius: 8.r,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12.sp,
-                    vertical: 8.sp,
+                  child: Icon(
+                    Icons.chevron_left,
+                    color: AppColors.whiteColor,
+                    size: ResponsiveHelper.adaptiveIconSize(
+                      data: data,
+                      baseSize: 24.0,
+                    ),
                   ),
                 ),
-              ),
-              16.horizontalSpace,
-              Expanded(
-                flex: 2,
-                child: CustomDropdown<int>(
-                  value: _currentMonth.year,
-                  options: _getYearOptions(),
-                  onChanged: (year) {
+                Expanded(
+                  flex: 3,
+                  child: CustomDropdown<int>(
+
+                    value: _currentMonth.month,
+                    options: List.generate(12, (index) => index + 1),
+                    onChanged: (month) {
+                      setState(() {
+                        _currentMonth = DateTime(_currentMonth.year, month);
+                      });
+                    },
+                    itemToString: (month) => _getMonthName(month),
+                    backgroundColor: AppColors.blackColor,
+                    textColor: AppColors.whiteColor,
+                    iconColor: AppColors.whiteColor,
+                    borderRadius: ResponsiveHelper.responsiveRadius(
+                      data: data,
+                      mobile: 8.0,
+                      tablet: 10.0,
+                      desktop: 12.0,
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: ResponsiveHelper.responsiveSpacing(
+                        data: data,
+                        mobile: 10.0,
+                        tablet: 12.0,
+                        desktop: 14.0,
+                      ),
+                      vertical: ResponsiveHelper.responsiveSpacing(
+                        data: data,
+                        mobile: 6.0,
+                        tablet: 8.0,
+                        desktop: 10.0,
+                      ),
+                    ),
+                  ),
+                ),
+                12.horizontalSpace,
+                Expanded(
+                  flex: 2,
+                  child: CustomDropdown<int>(
+                    value: _currentMonth.year,
+                    options: _getYearOptions(),
+                    onChanged: (year) {
+                      setState(() {
+                        _currentMonth = DateTime(year, _currentMonth.month);
+                      });
+                    },
+                    itemToString: (year) => year.toString(),
+                    backgroundColor: AppColors.blackColor,
+                    textColor: AppColors.whiteColor,
+                    iconColor: AppColors.whiteColor,
+                    borderRadius: ResponsiveHelper.responsiveRadius(
+                      data: data,
+                      mobile: 8.0,
+                      tablet: 10.0,
+                      desktop: 12.0,
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: ResponsiveHelper.responsiveSpacing(
+                        data: data,
+                        mobile: 10.0,
+                        tablet: 12.0,
+                        desktop: 14.0,
+                      ),
+                      vertical: ResponsiveHelper.responsiveSpacing(
+                        data: data,
+                        mobile: 6.0,
+                        tablet: 8.0,
+                        desktop: 10.0,
+                      ),
+                    ),
+                  ),
+                ),
+                CommonInkWell(
+                  onTap: () {
                     setState(() {
-                      _currentMonth = DateTime(year, _currentMonth.month);
+                      _currentMonth = DateTime(
+                        _currentMonth.year,
+                        _currentMonth.month + 1,
+                      );
                     });
                   },
-                  itemToString: (year) => year.toString(),
-                  backgroundColor: AppColors.blackColor,
-                  textColor: AppColors.whiteColor,
-                  iconColor: AppColors.whiteColor,
-                  borderRadius: 8.r,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12.sp,
-                    vertical: 8.sp,
+                  child: Icon(
+                    Icons.chevron_right,
+                    color: AppColors.whiteColor,
+                    size: ResponsiveHelper.adaptiveIconSize(
+                      data: data,
+                      baseSize: 24.0,
+                    ),
                   ),
                 ),
-              ),
-              CommonInkWell(
-                onTap: () {
-                  setState(() {
-                    _currentMonth = DateTime(
-                      _currentMonth.year,
-                      _currentMonth.month + 1,
-                    );
-                  });
-                },
-                child: Icon(Icons.chevron_right, color: AppColors.whiteColor),
-              ),
-            ],
-          ),
-          20.verticalSpace,
+              ],
+            ),
+            16.verticalSpace,
 
-          // Days of week header
-          Row(
-            children: ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day) {
-              return Expanded(
-                child: Text(
-                  day,
-                  textAlign: TextAlign.center,
-                  style: FontStyles.montserratRegular.copyWith(
-                    fontSize: 12.sp,
-                    color: AppColors.lightGreyColor,
+            Row(
+              children: ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day) {
+                return Expanded(
+                  child: Text(
+                    day,
+                    textAlign: TextAlign.center,
+                    style: FontStyles.montserratRegular.copyWith(
+                      fontSize: ResponsiveHelper.adaptiveFontSize(
+                        data: data,
+                        baseSize: 12.0,
+                        scaleFactor: 0.9,
+                      ),
+                      color: AppColors.lightGreyColor,
+                    ),
                   ),
-                ),
-              );
-            }).toList(),
-          ),
-          10.verticalSpace,
+                );
+              }).toList(),
+            ),
+            SizedBox(
+              height: ResponsiveHelper.responsiveSpacing(
+                data: data,
+                mobile: 8.0,
+                tablet: 10.0,
+                desktop: 12.0,
+              ),
+            ),
 
-          // Calendar grid
-          ..._buildCalendarDays(),
-        ],
+            // Calendar grid
+            ..._buildCalendarDays(data),
+          ],
+        ),
       ),
     );
   }
@@ -159,7 +220,7 @@ class _CalendarViewState extends State<_CalendarView> {
     return List.generate(endYear - startYear + 1, (index) => startYear + index);
   }
 
-  List<Widget> _buildCalendarDays() {
+  List<Widget> _buildCalendarDays(ResponsiveData data) {
     final daysInMonth = DateTime(
       _currentMonth.year,
       _currentMonth.month + 1,
@@ -197,24 +258,45 @@ class _CalendarViewState extends State<_CalendarView> {
           child: GestureDetector(
             onTap: isDisabled ? null : () => widget.selectDateTab(date),
             child: Container(
-              margin: EdgeInsets.all(2.sp),
-              height: 40.h,
+              margin: EdgeInsets.all(
+                ResponsiveHelper.responsiveSpacing(
+                  data: data,
+                  mobile: 1.5,
+                  tablet: 2.0,
+                  desktop: 2.5,
+                ),
+              ),
+              height: ResponsiveHelper.responsiveHeight(
+                data: data,
+                mobile: 36.0,
+                tablet: 40.0,
+                desktop: 44.0,
+              ),
               decoration: BoxDecoration(
                 color: isSelected ? AppColors.primaryColor : Colors.transparent,
-                borderRadius: BorderRadius.circular(20.r),
-                // Removed border for today's date - now treated as any available date
+                borderRadius: BorderRadius.circular(
+                  ResponsiveHelper.responsiveRadius(
+                    data: data,
+                    mobile: 18.0,
+                    tablet: 20.0,
+                    desktop: 22.0,
+                  ),
+                ),
               ),
               child: Center(
                 child: Text(
                   day.toString(),
                   style: FontStyles.montserratRegular.copyWith(
-                    fontSize: 14.sp,
+                    fontSize: ResponsiveHelper.adaptiveFontSize(
+                      data: data,
+                      baseSize: 14.0,
+                      scaleFactor: 1.0,
+                    ),
                     color: isDisabled
                         ? AppColors.lightGreyColor
                         : isSelected
                         ? AppColors.blackColor
-                        : AppColors
-                              .whiteColor, // All available dates (including today) are white
+                        : AppColors.whiteColor,
                   ),
                 ),
               ),

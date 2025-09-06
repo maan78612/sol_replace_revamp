@@ -10,24 +10,20 @@ enum DeviceType {
   tabletLarge,
   desktop,
   desktopLarge,
-  ultraWide
+  ultraWide,
 }
 
 /// Screen size category following Material Design 3 guidelines
 enum ScreenSize { compact, medium, expanded, large }
 
 /// Orientation with additional context
-enum ResponsiveOrientation { 
-  portrait, 
-  landscape, 
-  square 
-}
+enum ResponsiveOrientation { portrait, landscape, square }
 
 /// Device category for different interaction patterns
-enum DeviceCategory { 
-  touch,      // Mobile/Tablet
-  hybrid,     // Convertible devices
-  pointer     // Desktop/Mouse
+enum DeviceCategory {
+  touch, // Mobile/Tablet
+  hybrid, // Convertible devices
+  pointer, // Desktop/Mouse
 }
 
 /// Immutable responsive data class with comprehensive screen information
@@ -91,7 +87,7 @@ class ResponsiveData {
     assert(width > 0, 'Width must be positive');
     assert(height > 0, 'Height must be positive');
     assert(pixelRatio > 0, 'Pixel ratio must be positive');
-    
+
     return ResponsiveData._(
       deviceType: deviceType,
       screenSize: screenSize,
@@ -114,52 +110,80 @@ class ResponsiveData {
 
   // Convenience getters for device types
   bool get isMobile => deviceType == DeviceType.mobile;
+
   bool get isMobileLarge => deviceType == DeviceType.mobileLarge;
+
   bool get isTablet => deviceType == DeviceType.tablet;
+
   bool get isTabletLarge => deviceType == DeviceType.tabletLarge;
+
   bool get isDesktop => deviceType == DeviceType.desktop;
+
   bool get isDesktopLarge => deviceType == DeviceType.desktopLarge;
+
   bool get isUltraWide => deviceType == DeviceType.ultraWide;
 
   // Screen size convenience getters
   bool get isCompact => screenSize == ScreenSize.compact;
+
   bool get isMedium => screenSize == ScreenSize.medium;
+
   bool get isExpanded => screenSize == ScreenSize.expanded;
+
   bool get isLarge => screenSize == ScreenSize.large;
 
   // Orientation getters
-  bool get isPortrait => responsiveOrientation == ResponsiveOrientation.portrait;
-  bool get isLandscape => responsiveOrientation == ResponsiveOrientation.landscape;
+  bool get isPortrait =>
+      responsiveOrientation == ResponsiveOrientation.portrait;
+
+  bool get isLandscape =>
+      responsiveOrientation == ResponsiveOrientation.landscape;
+
   bool get isSquare => responsiveOrientation == ResponsiveOrientation.square;
 
   // Device category getters
   bool get isTouchDevice => deviceCategory == DeviceCategory.touch;
+
   bool get isHybridDevice => deviceCategory == DeviceCategory.hybrid;
+
   bool get isPointerDevice => deviceCategory == DeviceCategory.pointer;
 
   // Advanced dimension helpers
   bool get isWide => width > height;
+
   bool get isTall => height > width;
+
   double get aspectRatio => width / height;
+
   double get diagonalSize => math.sqrt(width * width + height * height);
+
   double get shortestSide => math.min(width, height);
+
   double get longestSide => math.max(width, height);
-  
+
   // Density and scaling helpers
   bool get isHighDensity => pixelRatio >= 2.0;
+
   bool get isLowDensity => pixelRatio < 1.5;
+
   bool get hasLargeText => textScaleFactor > 1.3;
+
   bool get hasSmallText => textScaleFactor < 0.9;
-  
+
   // Accessibility helpers
   bool get hasNotch => viewPadding.top > 24;
+
   bool get hasBottomInsets => viewInsets.bottom > 0;
+
   bool get isDarkMode => brightness == Brightness.dark;
+
   bool get isLightMode => brightness == Brightness.light;
 
   // Breakpoint helpers
   bool get isMobileRange => isMobile || isMobileLarge;
+
   bool get isTabletRange => isTablet || isTabletLarge;
+
   bool get isDesktopRange => isDesktop || isDesktopLarge || isUltraWide;
 
   @override
@@ -178,18 +202,19 @@ class ResponsiveData {
 
   @override
   int get hashCode => Object.hash(
-        deviceType,
-        screenSize,
-        deviceCategory,
-        responsiveOrientation,
-        width,
-        height,
-        orientation,
-        pixelRatio,
-      );
+    deviceType,
+    screenSize,
+    deviceCategory,
+    responsiveOrientation,
+    width,
+    height,
+    orientation,
+    pixelRatio,
+  );
 
   @override
-  String toString() => 'ResponsiveData('
+  String toString() =>
+      'ResponsiveData('
       'deviceType: $deviceType, '
       'screenSize: $screenSize, '
       'size: ${width.toStringAsFixed(1)}x${height.toStringAsFixed(1)}, '
@@ -244,16 +269,20 @@ class ResponsiveHelper {
   static DeviceCategory getDeviceCategory(double width, double height) {
     final diagonal = math.sqrt(width * width + height * height);
     if (diagonal < 7.0) return DeviceCategory.touch; // Phone/small tablet
-    if (diagonal < 13.0) return DeviceCategory.hybrid; // Large tablet/convertible
+    if (diagonal < 13.0)
+      return DeviceCategory.hybrid; // Large tablet/convertible
     return DeviceCategory.pointer; // Desktop/laptop
   }
 
   /// Get responsive orientation with square detection
-  static ResponsiveOrientation getResponsiveOrientation(double width, double height) {
+  static ResponsiveOrientation getResponsiveOrientation(
+    double width,
+    double height,
+  ) {
     final aspectRatio = width / height;
     if ((aspectRatio - 1.0).abs() < 0.1) return ResponsiveOrientation.square;
-    return width > height 
-        ? ResponsiveOrientation.landscape 
+    return width > height
+        ? ResponsiveOrientation.landscape
         : ResponsiveOrientation.portrait;
   }
 
@@ -269,7 +298,10 @@ class ResponsiveHelper {
     final deviceType = getDeviceType(size.width);
     final screenSize = getScreenSize(size.width);
     final deviceCategory = getDeviceCategory(size.width, size.height);
-    final responsiveOrientation = getResponsiveOrientation(size.width, size.height);
+    final responsiveOrientation = getResponsiveOrientation(
+      size.width,
+      size.height,
+    );
 
     return ResponsiveData.create(
       deviceType: deviceType,
@@ -313,11 +345,29 @@ class ResponsiveHelper {
       case DeviceType.tabletLarge:
         return tabletLarge ?? tablet ?? mobileLarge ?? mobile ?? fallback;
       case DeviceType.desktop:
-        return desktop ?? tabletLarge ?? tablet ?? mobileLarge ?? mobile ?? fallback;
+        return desktop ??
+            tabletLarge ??
+            tablet ??
+            mobileLarge ??
+            mobile ??
+            fallback;
       case DeviceType.desktopLarge:
-        return desktopLarge ?? desktop ?? tabletLarge ?? tablet ?? mobileLarge ?? mobile ?? fallback;
+        return desktopLarge ??
+            desktop ??
+            tabletLarge ??
+            tablet ??
+            mobileLarge ??
+            mobile ??
+            fallback;
       case DeviceType.ultraWide:
-        return ultraWide ?? desktopLarge ?? desktop ?? tabletLarge ?? tablet ?? mobileLarge ?? mobile ?? fallback;
+        return ultraWide ??
+            desktopLarge ??
+            desktop ??
+            tabletLarge ??
+            tablet ??
+            mobileLarge ??
+            mobile ??
+            fallback;
     }
   }
 
@@ -374,7 +424,7 @@ class ResponsiveHelper {
       return _lerp(desktop, ultraWide, progress);
     } else {
       // Beyond ultra-wide with controlled scaling
-      final extraScale = ultraWide != null 
+      final extraScale = ultraWide != null
           ? ((width - ultraWideBreak) / 500.0).clamp(0.0, 0.2)
           : ((width - desktopBreak) / 400.0).clamp(0.0, 0.3);
       final baseValue = ultraWide ?? desktop;
@@ -388,10 +438,10 @@ class ResponsiveHelper {
   }
 
   /// Expert responsive font size with proper scaling
-  /// 
+  ///
   /// This method provides fluid font scaling without double scaling issues.
   /// It considers screen density and text accessibility settings.
-  /// 
+  ///
   /// Use this for: Body text, descriptions, general content
   /// Use adaptiveFontSize() for: Titles, headings, UI elements
   /// Use simpleFontSize() for: Precise control over specific sizes
@@ -405,7 +455,7 @@ class ResponsiveHelper {
     bool respectTextScale = true,
   }) {
     double baseFontSize;
-    
+
     if (useFluidScaling) {
       baseFontSize = fluidValue(
         data: data,
@@ -430,7 +480,9 @@ class ResponsiveHelper {
     final scaledSize = baseFontSize * screenScale;
 
     // Apply text scale factor if enabled and reasonable
-    if (respectTextScale && data.textScaleFactor > 0.8 && data.textScaleFactor < 1.5) {
+    if (respectTextScale &&
+        data.textScaleFactor > 0.8 &&
+        data.textScaleFactor < 1.5) {
       return scaledSize * data.textScaleFactor;
     }
 
@@ -442,13 +494,13 @@ class ResponsiveHelper {
     // Base scale on screen width relative to a standard mobile width (375px)
     const standardWidth = 375.0;
     final widthRatio = data.width / standardWidth;
-    
+
     // Clamp the scale to reasonable bounds
     return widthRatio.clamp(0.8, 2.0);
   }
 
   /// Simple responsive font size for precise control
-  /// 
+  ///
   /// Provides exact font sizes per device type without any scaling.
   /// Best for: Icons, buttons, precise UI elements
   static double simpleFontSize({
@@ -469,10 +521,10 @@ class ResponsiveHelper {
   }
 
   /// Get font size based on screen category
-  /// 
+  ///
   /// Provides consistent scaling across device types with multipliers.
   /// Best for: Titles, headings, navigation, consistent UI text
-  /// 
+  ///
   /// Device multipliers:
   /// - Mobile: 0.9x
   /// - Mobile Large: 1.0x (base)
@@ -487,7 +539,7 @@ class ResponsiveHelper {
     double scaleFactor = 1.0,
   }) {
     double multiplier;
-    
+
     switch (data.deviceType) {
       case DeviceType.mobile:
         multiplier = 0.9;
@@ -511,7 +563,41 @@ class ResponsiveHelper {
         multiplier = 1.3;
         break;
     }
-    
+
+    return baseSize * multiplier * scaleFactor;
+  }
+
+  static double adaptiveIconSize({
+    required ResponsiveData data,
+    required double baseSize,
+    double scaleFactor = 1.0,
+  }) {
+    double multiplier;
+
+    switch (data.deviceType) {
+      case DeviceType.mobile:
+        multiplier = 1.0;
+        break;
+      case DeviceType.mobileLarge:
+        multiplier = 1.0;
+        break;
+      case DeviceType.tablet:
+        multiplier = 1.1;
+        break;
+      case DeviceType.tabletLarge:
+        multiplier = 1.15;
+        break;
+      case DeviceType.desktop:
+        multiplier = 1.2;
+        break;
+      case DeviceType.desktopLarge:
+        multiplier = 1.25;
+        break;
+      case DeviceType.ultraWide:
+        multiplier = 1.3;
+        break;
+    }
+
     return baseSize * multiplier * scaleFactor;
   }
 
@@ -525,7 +611,7 @@ class ResponsiveHelper {
     bool useFluidScaling = true,
   }) {
     double baseSpacing;
-    
+
     if (useFluidScaling) {
       baseSpacing = fluidValue(
         data: data,
@@ -558,7 +644,7 @@ class ResponsiveHelper {
     bool useFluidScaling = true,
   }) {
     double baseWidth;
-    
+
     if (useFluidScaling) {
       baseWidth = fluidValue(
         data: data,
@@ -591,7 +677,7 @@ class ResponsiveHelper {
     bool useFluidScaling = true,
   }) {
     double baseHeight;
-    
+
     if (useFluidScaling) {
       baseHeight = fluidValue(
         data: data,
@@ -624,7 +710,7 @@ class ResponsiveHelper {
     bool useFluidScaling = true,
   }) {
     double baseRadius;
-    
+
     if (useFluidScaling) {
       baseRadius = fluidValue(
         data: data,
@@ -657,7 +743,7 @@ class ResponsiveHelper {
     bool useFluidScaling = true,
   }) {
     double baseIconSize;
-    
+
     if (useFluidScaling) {
       baseIconSize = fluidValue(
         data: data,
@@ -724,10 +810,7 @@ class ResponsiveHelper {
 class ResponsiveWidget extends StatelessWidget {
   final Widget Function(BuildContext context, ResponsiveData data) builder;
 
-  const ResponsiveWidget({
-    super.key,
-    required this.builder,
-  });
+  const ResponsiveWidget({super.key, required this.builder});
 
   @override
   Widget build(BuildContext context) {
