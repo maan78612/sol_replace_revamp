@@ -1,26 +1,20 @@
 part of 'package:sol_replace_revamp/src/features/splash/splash_library.dart';
 
 /// Expert-level responsive splash view with fluid transitions
-class SplashView extends ConsumerStatefulWidget {
+class SplashView extends StatefulWidget {
   const SplashView({super.key});
 
   @override
-  ConsumerState<SplashView> createState() => _SplashViewState();
+  State<SplashView> createState() => _SplashViewState();
 }
 
-class _SplashViewState extends ConsumerState<SplashView>
-    with TickerProviderStateMixin {
+class _SplashViewState extends State<SplashView>
+    with SingleTickerProviderStateMixin { // Use single ticker for better performance
   late AnimationController _animationController;
-  late AnimationController _scaleController;
   late Animation<Offset> _slideAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<double> _opacityAnimation;
 
-  final splashViewModelProvider = ChangeNotifierProvider<SplashViewModel>((
-    ref,
-  ) {
-    return SplashViewModel(ref);
-  });
 
   @override
   void initState() {
@@ -31,21 +25,14 @@ class _SplashViewState extends ConsumerState<SplashView>
   @override
   void dispose() {
     _animationController.dispose();
-    _scaleController.dispose();
     super.dispose();
   }
 
   void _initializeAnimations() {
-    // Main slide animation
+    // Optimized single animation controller approach
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1800),
-    );
-
-    // Scale animation for responsive transitions
-    _scaleController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 1500), // Reduced duration
     );
 
     _slideAnimation =
@@ -57,28 +44,30 @@ class _SplashViewState extends ConsumerState<SplashView>
         );
 
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
+      CurvedAnimation(
+        parent: _animationController, 
+        curve: const Interval(0.0, 0.7, curve: Curves.easeOutBack),
+      ),
     );
 
     _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+        curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
       ),
     );
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _startAnimations();
-    });
+    // Use microtask for better performance
+    scheduleMicrotask(_startAnimations);
   }
 
   void _startAnimations() {
     _animationController.forward();
-    _scaleController.forward();
 
-    Future.delayed(const Duration(milliseconds: 1800), () async {
+    Future.delayed(const Duration(milliseconds: 1500), () async {
       if (mounted) {
-        await ref.read(splashViewModelProvider).checkAutoLogin();
+        // Trigger auto login check through Bloc
+        context.read<SplashBloc>().add(const CheckAutoLogin());
       }
     });
   }
@@ -91,10 +80,7 @@ class _SplashViewState extends ConsumerState<SplashView>
         child: ResponsiveWidget(
           builder: (context, data) {
             return AnimatedBuilder(
-              animation: Listenable.merge([
-                _animationController,
-                _scaleController,
-              ]),
+              animation: _animationController,
               builder: (context, child) {
                 return SizedBox(
                   width: double.infinity,

@@ -1,64 +1,65 @@
 part of 'package:sol_replace_revamp/src/features/auth/auth_library.dart';
 
-class _SignUpComponent extends ConsumerWidget {
-  _SignUpComponent();
-
-  final _signUpVMProvider = ChangeNotifierProvider<_SignUpVM>((ref) {
-    return _SignUpVM();
-  });
+class _SignUpComponent extends StatelessWidget {
+  const _SignUpComponent();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final vm = ref.watch(_signUpVMProvider);
+  Widget build(BuildContext context) {
     return ResponsiveWidget(
       builder: (context, data) {
-        return Column(
-          children: [
-            CustomInputField(
-              hint: 'Email',
-              titleIcon: AppIcons.email,
-              title: 'Enter your email.',
-              textInputAction: TextInputAction.next,
-              keyboardType: TextInputType.emailAddress,
-              controller: vm.emailCont,
-              onChange: (value) => vm.onChange(
-                con: vm.emailCont,
-                value: value,
-                validator: TextFieldValidator.validateEmail,
-              ),
-              suffixWidget: _getSuffixIcon(con: vm.emailCont),
-            ),
-            30.verticalSpace,
-            CustomInputField(
-              hint: "Enter your name.",
-              title: 'Name',
-              titleIcon: AppIcons.name,
-              textInputAction: TextInputAction.next,
-              keyboardType: TextInputType.name,
-              controller: vm.nameCont,
-              onChange: (value) => vm.onChange(
-                con: vm.nameCont,
-                value: value,
-                validator: TextFieldValidator.validateFullName,
-              ),
-              suffixWidget: _getSuffixIcon(con: vm.nameCont),
-            ),
-            30.verticalSpace,
-            _DOBPicker(
-              setDate: (DateTime date) => vm.setDate(date),
-              controller: vm.dobCon,
-            ),
-            30.verticalSpace,
-            _PasswordForm(_signUpVMProvider),
-            40.verticalSpace,
-            CustomButton(
-              title: "SIGN UP",
-              onPressed: () => vm.registerUser(),
-              bgColor: AppColors.primaryColor,
-              textColor: AppColors.whiteColor,
-            ),
-            30.verticalSpace,
-          ],
+        return BlocBuilder<SignUpBloc, SignUpState>(
+          builder: (ctx, state) {
+            return Column(
+              children: [
+                CustomInputField(
+                  hint: 'Email',
+                  titleIcon: AppIcons.email,
+                  title: 'Enter your email.',
+                  textInputAction: TextInputAction.next,
+                  keyboardType: TextInputType.emailAddress,
+                  controller: state.emailController,
+                  onChange: (value) {
+                    context.read<SignUpBloc>().add(SignUpEmailChanged(value));
+                  },
+                  suffixWidget: _getSuffixIcon(con: state.emailController),
+                ),
+                30.verticalSpace,
+                CustomInputField(
+                  hint: "Enter your name.",
+                  title: 'Name',
+                  titleIcon: AppIcons.name,
+                  textInputAction: TextInputAction.next,
+                  keyboardType: TextInputType.name,
+                  controller: state.nameController,
+                  onChange: (value) {
+                    context.read<SignUpBloc>().add(SignUpNameChanged(value));
+                  },
+                  suffixWidget: _getSuffixIcon(con: state.nameController),
+                ),
+                30.verticalSpace,
+                _DOBPicker(
+                  setDate: (DateTime date) {
+                    context.read<SignUpBloc>().add(
+                      SignUpDateOfBirthChanged(date),
+                    );
+                  },
+                  controller: state.dobController,
+                ),
+                30.verticalSpace,
+                _PasswordForm(),
+                40.verticalSpace,
+                CustomButton(
+                  isEnable: state.isFormValid,
+                  title: "SIGN UP",
+                  onPressed: () =>
+                      context.read<SignUpBloc>().add(const SignUpSubmitted()),
+                  bgColor: AppColors.primaryColor,
+                  textColor: AppColors.whiteColor,
+                ),
+                30.verticalSpace,
+              ],
+            );
+          },
         );
       },
     );
@@ -71,7 +72,6 @@ class _SignUpComponent extends ConsumerWidget {
             color: con.error != null
                 ? AppColors.redColor
                 : AppColors.primaryColor,
-
           )
         : null;
   }

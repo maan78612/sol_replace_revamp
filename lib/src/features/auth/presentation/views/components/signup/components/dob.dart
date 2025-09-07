@@ -1,13 +1,13 @@
 part of 'package:sol_replace_revamp/src/features/auth/auth_library.dart';
 
-class _DOBPicker extends ConsumerWidget {
+class _DOBPicker extends StatelessWidget {
   final Function(DateTime) setDate;
   final CustomTextController controller;
 
   const _DOBPicker({required this.setDate, required this.controller});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return ResponsiveWidget(
       builder: (context, data) {
         return Column(

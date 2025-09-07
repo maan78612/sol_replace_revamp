@@ -1,53 +1,51 @@
 part of 'package:sol_replace_revamp/src/features/auth/auth_library.dart';
 
-class _PasswordForm extends ConsumerWidget {
-  final ChangeNotifierProvider<_SignUpVM> signUpVMProvider;
-
-  const _PasswordForm(this.signUpVMProvider);
+class _PasswordForm extends StatelessWidget {
+  const _PasswordForm();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final signUpVM = ref.watch(signUpVMProvider);
+  Widget build(BuildContext context) {
     return ResponsiveWidget(
       builder: (context, data) {
-        return Column(
-          children: [
-            CustomInputField(
-              title: 'Password',
-              titleIcon: AppIcons.lock,
-              hint: 'Enter your password.',
-              obscure: true,
-              textInputAction: TextInputAction.next,
-              controller: signUpVM.passwordCont,
-              onChange: (value) => signUpVM.validatePassword(value),
-            ),
-            30.verticalSpace,
-            CustomInputField(
-              title: 'Confirm Password',
-              titleIcon: AppIcons.lock,
-              hint: 'Enter your password.',
-              obscure: true,
-              textInputAction: TextInputAction.done,
-              controller: signUpVM.confirmPassCont,
-              onChange: (value) => signUpVM.onChange(
-                con: signUpVM.confirmPassCont,
-                value: value,
-                validator: (val) => TextFieldValidator.validateConfirmPassword(
-                  val,
-                  signUpVM.passwordCont.controller.text,
+        return BlocBuilder<SignUpBloc, SignUpState>(
+          builder: (context, state) {
+            return Column(
+              children: [
+                CustomInputField(
+                  title: 'Password',
+                  titleIcon: AppIcons.lock,
+                  hint: 'Enter your password.',
+                  obscure: true,
+                  textInputAction: TextInputAction.next,
+                  controller: state.passwordController,
+                  onChange: (value) {
+                    context.read<SignUpBloc>().add(SignUpPasswordChanged(value));
+                  },
                 ),
-              ),
-            ),
+                30.verticalSpace,
+                CustomInputField(
+                  title: 'Confirm Password',
+                  titleIcon: AppIcons.lock,
+                  hint: 'Enter your password.',
+                  obscure: true,
+                  textInputAction: TextInputAction.done,
+                  controller: state.confirmPasswordController,
+                  onChange: (value) {
+                    context.read<SignUpBloc>().add(SignUpConfirmPasswordChanged(value));
+                  },
+                ),
 
-            if (signUpVM.shouldShowPasswordValidation)
-              _passwordValidator(signUpVM),
-          ],
+                if (state.shouldShowPasswordValidation)
+                  _passwordValidator(state),
+              ],
+            );
+          },
         );
       },
     );
   }
 
-  Widget _passwordValidator(_SignUpVM vm) {
+  Widget _passwordValidator(SignUpState state) {
     return Column(
       children: [
         24.verticalSpace,
@@ -59,13 +57,13 @@ class _PasswordForm extends ConsumerWidget {
             bool isActive;
             if (index < 2) {
               // First two containers for min length
-              isActive = vm.hasMinLength;
+              isActive = state.hasMinLength;
             } else if (index < 4) {
               // Next two containers for uppercase
-              isActive = vm.hasUppercase;
+              isActive = state.hasUppercase;
             } else {
               // Last two containers for special character
-              isActive = vm.hasSpecialChar;
+              isActive = state.hasSpecialChar;
             }
 
             return Container(
@@ -81,13 +79,13 @@ class _PasswordForm extends ConsumerWidget {
         ),
         15.verticalSpace,
 
-        _buildValidationRow('At least 8 characters', vm.hasMinLength),
+        _buildValidationRow('At least 8 characters', state.hasMinLength),
         4.verticalSpace,
-        _buildValidationRow('At least one uppercase letter', vm.hasUppercase),
+        _buildValidationRow('At least one uppercase letter', state.hasUppercase),
         4.verticalSpace,
         _buildValidationRow(
           'At least one special character',
-          vm.hasSpecialChar,
+          state.hasSpecialChar,
         ),
       ],
     );

@@ -1,6 +1,5 @@
-import 'package:flutter/cupertino.dart';
-import 'package:sol_replace_revamp/src/features/otp/data/data_source/remote/otp_data_source.dart';
-import 'package:sol_replace_revamp/src/features/otp/domain/repositories/otp_repository.dart';
+part of 'package:sol_replace_revamp/src/features/otp/otp_library.dart';
+
 
 class OtpRepositoryImpl implements OtpRepository {
   final OtpDataSource _dataSource;

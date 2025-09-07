@@ -2,11 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sol_replace_revamp/src/core/globals/system_overlay.dart';
 import 'package:sol_replace_revamp/src/core/globals/variables.dart';
+import 'package:sol_replace_revamp/src/core/di/service_locator.dart';
 import 'package:sol_replace_revamp/src/features/splash/splash_library.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -17,7 +18,7 @@ void main() async {
     // DevicePreview(
     //   enabled: kDebugMode,
     //   builder: (context) =>
-    ProviderScope(child: MyApp()),
+    MyApp(),
 
     // ),
   );
@@ -45,11 +46,11 @@ Future<void> _initMethod() async {
   );
 }
 
-class MyApp extends ConsumerWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     // Set global dark mode overlay style
     SystemChrome.setSystemUIOverlayStyle(
       getSystemOverlayStyle(isDarkMode: false),
@@ -63,12 +64,16 @@ class MyApp extends ConsumerWidget {
           onTap: () {
             FocusManager.instance.primaryFocus?.unfocus();
           },
-          child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-
-            navigatorKey: materialAppKey,
-            title: 'SolReplace',
-            home: const SplashView(),
+          child: BlocProvider(
+            create: (context) => SplashBloc(
+              splashRepository: ServiceLocator.instance.splashRepository,
+            ),
+            child: MaterialApp(
+              debugShowCheckedModeBanner: false,
+              navigatorKey: materialAppKey,
+              title: 'SolReplace',
+              home: const SplashView(),
+            ),
           ),
         );
       },

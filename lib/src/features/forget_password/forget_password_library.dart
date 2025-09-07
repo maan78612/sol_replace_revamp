@@ -11,35 +11,30 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:equatable/equatable.dart';
+import 'package:sol_replace_revamp/src/core/components/custom_button.dart';
+import 'package:sol_replace_revamp/src/core/components/custom_inkwell.dart';
+import 'package:sol_replace_revamp/src/core/components/custom_input_field.dart';
+import 'package:sol_replace_revamp/src/core/components/custom_text_controller.dart';
 import 'package:sol_replace_revamp/src/core/constants/colors.dart';
 import 'package:sol_replace_revamp/src/core/constants/fonts.dart';
 import 'package:sol_replace_revamp/src/core/constants/icons.dart';
-import 'package:sol_replace_revamp/src/core/constants/supabase.dart';
 import 'package:sol_replace_revamp/src/core/di/service_locator.dart';
+import 'package:sol_replace_revamp/src/core/globals/text_field_validator.dart';
+import 'package:sol_replace_revamp/src/core/enums/snackbar_status.dart';
 import 'package:sol_replace_revamp/src/core/services/custom_navigation.dart';
+import 'package:sol_replace_revamp/src/core/utilities/custom_snack_bar.dart';
 import 'package:sol_replace_revamp/src/core/utilities/responsive_helper.dart';
 import 'package:sol_replace_revamp/src/features/auth/auth_library.dart';
-import 'package:sol_replace_revamp/src/features/auth/domain/model/user_model.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:sol_replace_revamp/src/features/otp/otp_library.dart';
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  PART FILES - ORGANIZED BY LAYER
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 //  PRESENTATION LAYER - VIEWS
-part 'presentation/views/splash_view.dart';
+part 'presentation/views/send_email_view.dart';
 
 //  PRESENTATION LAYER - BLOC
-part 'presentation/bloc/splash/splash_event.dart';
-part 'presentation/bloc/splash/splash_state.dart';
-part 'presentation/bloc/splash/splash_bloc.dart';
-
-//  DATA LAYER - SOURCES
-part 'data/data_source/remote/splash_data_source.dart';
-part 'data/data_source/local/splash_data_source_locally.dart';
-
-//  DATA LAYER - REPOSITORY IMPLEMENTATIONS
-part 'data/repositories/splash_repository_impl.dart';
-
-//  DOMAIN LAYER - REPOSITORY CONTRACTS
-part 'domain/repositories/splash_repository.dart';
+part 'presentation/bloc/send_email/send_email_event.dart';
+part 'presentation/bloc/send_email/send_email_state.dart';
+part 'presentation/bloc/send_email/send_email_bloc.dart';

@@ -2,7 +2,6 @@ import 'package:sol_replace_revamp/src/core/globals/variables.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:sol_replace_revamp/src/core/components/custom_inkwell.dart';
-import 'package:sol_replace_revamp/src/core/components/custom_input_field.dart';
 import 'package:sol_replace_revamp/src/core/constants/colors.dart';
 import 'package:sol_replace_revamp/src/core/constants/fonts.dart';
 import 'package:sol_replace_revamp/src/core/utilities/responsive_helper.dart';
@@ -10,7 +9,7 @@ import 'package:sol_replace_revamp/src/core/utilities/responsive_helper.dart';
 class CustomButton extends StatelessWidget {
   final String? title;
   final bool isEnable;
-  final Function() onPressed;
+  final VoidCallback onPressed; // Use VoidCallback for better performance
   final Widget? icon;
   final Color bgColor;
   final Color? disableBgColor;
@@ -34,10 +33,10 @@ class CustomButton extends StatelessWidget {
     this.fontSize,
     this.textStyle,
     this.isEnable = true,
-    this.loadingColor = AppColors.blackColor,
+    this.loadingColor = AppColors.whiteColor,
     this.isLoading = false,
     this.loadingSize = 25.0,
-    this.textColor = AppColors.blackColor,
+    this.textColor = AppColors.whiteColor,
     required this.onPressed,
     this.borderColor,
     this.width,
@@ -67,7 +66,7 @@ class CustomButton extends StatelessWidget {
       onTap: isEnable ? onPressed : null,
       child: Container(
         width: buttonWidth,
-        height: height ?? inputFieldHeight,
+        height: height ?? inputFieldHeight(data),
         alignment: Alignment.center,
         decoration: BoxDecoration(
           border: isEnable ? Border.all(color: borderColor ?? bgColor) : null,
@@ -97,6 +96,7 @@ class CustomButton extends StatelessWidget {
               )
             : Row(
                 mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 // Critical fix: Shrink row to content width
                 children: [
                   if (icon != null) icon!,

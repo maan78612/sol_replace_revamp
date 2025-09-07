@@ -1,6 +1,6 @@
 part of 'package:sol_replace_revamp/src/features/auth/auth_library.dart';
 
-class AuthDataSource {
+class AuthDataSource implements OtpDataSource {
   final GoTrueClient _auth = SBTables.auth;
 
   Future<bool> isUserRegistered(String email) async {
@@ -105,6 +105,41 @@ class AuthDataSource {
       return true;
     } catch (e) {
       throw ("Authentication Error : ${e.toString()}");
+    }
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  //  Override Methods of OTP DataSource for Authentication
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  @override
+  Future<void> sendOtpOnEmail({required String email}) async {
+    try {
+      await _auth.resend(type: OtpType.signup, email: email);
+    } on AuthApiException catch (e) {
+      throw 'Failed to send verification email: ${e.message}';
+    } catch (e) {
+      debugPrint("Unknown error sendOtpOnEmail = $e");
+      throw e.toString();
+    }
+  }
+
+  @override
+  Future<void> verifyOTP({required String email, required String token}) async {
+    try {
+      final response = await SBTables.auth.verifyOTP(
+        email: email,
+        token: token,
+        type: OtpType.email,
+      );
+
+      if (response.user == null) {
+        throw 'Email verification failed: No user returned';
+      }
+    } on AuthApiException catch (e) {
+      throw 'Email verification failed: ${e.message}';
+    } catch (e) {
+      throw 'An unexpected error occurred during email verification.';
     }
   }
 }

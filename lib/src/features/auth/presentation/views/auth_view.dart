@@ -1,105 +1,38 @@
 part of 'package:sol_replace_revamp/src/features/auth/auth_library.dart';
 
-class AuthView extends ConsumerWidget {
-  AuthView({super.key});
-
-  final _authVmProvider = ChangeNotifierProvider<_AuthVm>((ref) {
-    return _AuthVm();
-  });
+class AuthView extends StatelessWidget {
+  const AuthView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final vm = ref.watch(_authVmProvider);
-
-    return Scaffold(
-      backgroundColor: AppColors.whiteColor,
-      body: ResponsiveWidget(
-        builder: (context, data) => _buildResponsiveLayout(context, data, vm),
-      ),
-    );
-  }
-
-  Widget _buildResponsiveLayout(
-    BuildContext context,
-    ResponsiveData data,
-    _AuthVm vm,
-  ) {
-    // Use screen size categories for cleaner layout decisions
-    switch (data.screenSize) {
-      case ScreenSize.compact:
-        return _buildMobileLayout(context, data, vm);
-      case ScreenSize.medium:
-      case ScreenSize.expanded:
-      case ScreenSize.large:
-        return _buildDesktopTabletLayout(context, data, vm);
-    }
-  }
-
-  Widget _buildMobileLayout(
-    BuildContext context,
-    ResponsiveData data,
-    _AuthVm vm,
-  ) {
-    return SingleChildScrollView(
-      padding: ResponsiveHelper.responsivePadding(data),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          40.verticalSpace,
-          _Switcher(_authVmProvider),
-          _buildAuthCard(context, data, vm),
-          30.verticalSpace,
-          _SocialAuth(_authVmProvider),
-          20.verticalSpace,
-          _buildTermsText(data, vm),
-          40.verticalSpace,
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTermsText(ResponsiveData data, _AuthVm vm) {
-    final fontSize = ResponsiveHelper.adaptiveFontSize(
-      data: data,
-      baseSize: 14.0,
-      scaleFactor: 0.95,
-    );
-
-    return RichText(
-      textAlign: TextAlign.center,
-      text: TextSpan(
-        text:
-            "By ${vm.authScreenType == AuthType.login ? "login" : "signup"} in you are agreeing our\n",
-        style: FontStyles.montserratRegular.copyWith(
-          fontSize: fontSize,
-          color: AppColors.blackColor,
-          height: 1.6.h,
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(
+          create: (context) =>
+              AuthBloc(authRepository: ServiceLocator.instance.authRepository),
         ),
-        children: <TextSpan>[
-          TextSpan(
-            text: 'Term and privacy policy',
-            style: FontStyles.montserratRegular.copyWith(
-              fontSize: fontSize,
-              color: AppColors.primaryColor,
-              decoration: TextDecoration.underline,
-              decorationColor: AppColors.primaryColor,
-            ),
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                // Handle terms and privacy policy tap
-              },
+        BlocProvider<LoginBloc>(
+          create: (context) =>
+              LoginBloc(authRepository: ServiceLocator.instance.authRepository),
+        ),
+        BlocProvider<SignUpBloc>(
+          create: (context) => SignUpBloc(
+            authRepository: ServiceLocator.instance.authRepository,
           ),
-        ],
+        ),
+      ],
+      child: Scaffold(
+        backgroundColor: AppColors.whiteColor,
+        body: ResponsiveWidget(
+          builder: (context, data) => _body(context, data),
+        ),
       ),
     );
   }
 
-  Widget _buildDesktopTabletLayout(
-    BuildContext context,
-    ResponsiveData data,
-    _AuthVm vm,
-  ) {
+
+
+  Widget _body(BuildContext context, ResponsiveData data) {
     return Row(
       children: [
         // Left side illustration (only for desktop)
@@ -112,7 +45,7 @@ class AuthView extends ConsumerWidget {
               desktopLarge: 3,
               fallback: 1,
             ),
-            child: _buildIllustrationSection(context, data, vm),
+            child: _sideLogo(context, data),
           ),
         ],
 
@@ -125,17 +58,53 @@ class AuthView extends ConsumerWidget {
             desktopLarge: 2,
             fallback: 1,
           ),
-          child: _buildFormSection(context, data, vm),
+          child: _buildFormSection(context, data),
         ),
       ],
     );
   }
 
-  Widget _buildIllustrationSection(
-    BuildContext context,
-    ResponsiveData data,
-    _AuthVm vm,
-  ) {
+
+  Widget _buildTermsText(ResponsiveData data) {
+    final fontSize = ResponsiveHelper.adaptiveFontSize(
+      data: data,
+      baseSize: 14.0,
+      scaleFactor: 0.95,
+    );
+
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        return RichText(
+          textAlign: TextAlign.center,
+          text: TextSpan(
+            text:
+            "By ${state.authType == AuthType.login ? "login" : "signup"} in you are agreeing our\n",
+            style: FontStyles.montserratRegular.copyWith(
+              fontSize: fontSize,
+              color: AppColors.blackColor,
+              height: 1.6.h,
+            ),
+            children: <TextSpan>[
+              TextSpan(
+                text: 'Term and privacy policy',
+                style: FontStyles.montserratRegular.copyWith(
+                  fontSize: fontSize,
+                  color: AppColors.primaryColor,
+                  decoration: TextDecoration.underline,
+                  decorationColor: AppColors.primaryColor,
+                ),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    // Handle terms and privacy policy tap
+                  },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+  Widget _sideLogo(BuildContext context, ResponsiveData data) {
     return Container(
       height: data.height,
       padding: ResponsiveHelper.responsivePadding(data),
@@ -157,23 +126,24 @@ class AuthView extends ConsumerWidget {
               ultraWide: data.height * 0.6,
             ),
           ),
-          child: SvgPicture.asset(
-            vm.authScreenType == AuthType.login
-                ? AppIcons.login
-                : AppIcons.signup,
-            placeholderBuilder: (context) => const CircularProgressIndicator(),
-            fit: BoxFit.contain,
+          child: BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, state) {
+              return SvgPicture.asset(
+                state.authType == AuthType.login
+                    ? AppIcons.login
+                    : AppIcons.signup,
+                placeholderBuilder: (context) =>
+                    const CircularProgressIndicator(),
+                fit: BoxFit.contain,
+              );
+            },
           ),
         ),
       ),
     );
   }
 
-  Widget _buildFormSection(
-    BuildContext context,
-    ResponsiveData data,
-    _AuthVm vm,
-  ) {
+  Widget _buildFormSection(BuildContext context, ResponsiveData data) {
     final elevation = ResponsiveHelper.value<double>(
       data: data,
       mobile: 0.0,
@@ -209,12 +179,12 @@ class AuthView extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               40.verticalSpace,
-              _Switcher(_authVmProvider),
-              _buildAuthCard(context, data, vm),
+              const _Switcher(),
+              _buildAuthCard(context, data),
               30.verticalSpace,
-              _SocialAuth(_authVmProvider),
+              const _SocialAuth(),
               20.verticalSpace,
-              _buildTermsText(data, vm),
+              _buildTermsText(data),
               30.verticalSpace,
             ],
           ),
@@ -223,15 +193,19 @@ class AuthView extends ConsumerWidget {
     );
   }
 
-  Widget _buildAuthCard(BuildContext context, ResponsiveData data, _AuthVm vm) {
+  Widget _buildAuthCard(BuildContext context, ResponsiveData data) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         40.verticalSpace,
-        vm.authScreenType == AuthType.login
-            ? _LoginComponent()
-            : _SignUpComponent(),
+        BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, state) {
+            return state.authType == AuthType.login
+                ? const _LoginComponent()
+                : const _SignUpComponent();
+          },
+        ),
         10.verticalSpace,
       ],
     );

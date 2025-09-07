@@ -48,7 +48,7 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
             constraints: const BoxConstraints(maxWidth: 700),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16.r),
-              color: AppColors.blackColor,
+              color: AppColors.whiteColor,
             ),
             padding: EdgeInsets.symmetric(
               vertical: ResponsiveHelper.responsiveSpacing(
@@ -68,23 +68,9 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _header(context, data),
-                SizedBox(
-                  height: ResponsiveHelper.responsiveSpacing(
-                    data: data,
-                    mobile: 16.0,
-                    tablet: 20.0,
-                    desktop: 24.0,
-                  ),
-                ),
+                14.verticalSpace,
                 _tabBar(data),
-                SizedBox(
-                  height: ResponsiveHelper.responsiveSpacing(
-                    data: data,
-                    mobile: 16.0,
-                    tablet: 20.0,
-                    desktop: 24.0,
-                  ),
-                ),
+                14.verticalSpace,
 
                 if (_pickerMode == PickerModeEnum.calender)
                   _CalendarView(
@@ -117,16 +103,9 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
                     },
                   ),
 
-                SizedBox(
-                  height: ResponsiveHelper.responsiveSpacing(
-                    data: data,
-                    mobile: 20.0,
-                    tablet: 24.0,
-                    desktop: 28.0,
-                  ),
-                ),
+                20.verticalSpace,
 
-                _buildSelectButton(data, dialogWidth),
+                _selectButton(data, dialogWidth),
               ],
             ),
           );
@@ -155,7 +134,7 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
   }
 
   /// Build responsive select button
-  Widget _buildSelectButton(ResponsiveData data, double dialogWidth) {
+  Widget _selectButton(ResponsiveData data, double dialogWidth) {
     final buttonWidth = ResponsiveHelper.value<double>(
       data: data,
       mobile: dialogWidth * 0.8,
@@ -201,7 +180,7 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
               baseSize: 18.0,
               scaleFactor: 1.0,
             ),
-            color: AppColors.whiteColor,
+            color: AppColors.blackColor,
           ),
         ),
         IconButton(
@@ -210,7 +189,7 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
             data: data,
             baseSize: 24.0,
           ),
-          icon: Icon(Icons.close, color: AppColors.whiteColor),
+          icon: Icon(Icons.close, color: AppColors.blackColor),
         ),
       ],
     );
@@ -233,7 +212,7 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
         ),
       ),
       decoration: BoxDecoration(
-        color: AppColors.blackColor,
+        color: AppColors.whiteColor,
         borderRadius: BorderRadius.circular(
           ResponsiveHelper.responsiveRadius(
             data: data,
@@ -283,7 +262,7 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
             ),
           ),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primaryColor : Colors.transparent,
+            color: isSelected ? AppColors.primaryColor : AppColors.greyColor,
             borderRadius: BorderRadius.circular(
               ResponsiveHelper.responsiveRadius(
                 data: data,
@@ -302,7 +281,7 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
                 baseSize: 14.0,
                 scaleFactor: 0.9,
               ),
-              color: isSelected ? AppColors.blackColor : AppColors.whiteColor,
+              color: isSelected ? AppColors.whiteColor : AppColors.blackColor,
             ),
           ),
         ),

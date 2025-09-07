@@ -13,7 +13,8 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
-  flutter_riverpod: ^2.6.1
+  flutter_bloc: ^8.1.6
+  equatable: ^2.0.5
   flutter_screenutil: ^5.9.3
   modal_progress_hud_nsn: ^0.5.1
   another_flushbar: ^1.12.30

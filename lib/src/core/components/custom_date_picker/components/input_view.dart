@@ -38,68 +38,49 @@ class _InputViewState extends State<_InputView> {
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              height: ResponsiveHelper.responsiveSpacing(
-                data: data,
-                mobile: 8.0,
-                tablet: 10.0,
-                desktop: 12.0,
+           Spacer(),
+            CustomInputField(
+
+              controller: widget.textController,
+              hint: widget.fieldHintText ?? 'dd/mm/yyyy',
+              label: widget.fieldLabelText ?? 'Enter date',
+              suffixWidget: widget.suffixWidget,
+              errorPadding: EdgeInsets.symmetric(
+                vertical: ResponsiveHelper.responsiveSpacing(
+                  data: data,
+                  mobile: 6.0,
+                  tablet: 8.0,
+                  desktop: 10.0,
+                ),
+                horizontal: ResponsiveHelper.responsiveSpacing(
+                  data: data,
+                  mobile: 8.0,
+                  tablet: 10.0,
+                  desktop: 12.0,
+                ),
               ),
+              inputFormatters: [
+                _DateInputFormatter(),
+                LengthLimitingTextInputFormatter(10),
+              ],
+              onChange: (value) {
+                _parseAndSetDate(value);
+              },
             ),
-          CustomInputField(
-            controller: widget.textController,
-            hint: widget.fieldHintText ?? 'dd/mm/yyyy',
-            label: widget.fieldLabelText ?? 'Enter date',
-            suffixWidget: widget.suffixWidget,
-            errorPadding: EdgeInsets.symmetric(
-              vertical: ResponsiveHelper.responsiveSpacing(
-                data: data,
-                mobile: 6.0,
-                tablet: 8.0,
-                desktop: 10.0,
-              ),
-              horizontal: ResponsiveHelper.responsiveSpacing(
-                data: data,
-                mobile: 8.0,
-                tablet: 10.0,
-                desktop: 12.0,
-              ),
-            ),
-            inputFormatters: [
-              _DateInputFormatter(),
-              LengthLimitingTextInputFormatter(10),
-            ],
-            onChange: (value) {
-              _parseAndSetDate(value);
-            },
-          ),
-          SizedBox(
-            height: ResponsiveHelper.responsiveSpacing(
-              data: data,
-              mobile: 8.0,
-              tablet: 10.0,
-              desktop: 12.0,
-            ),
-          ),
-          if (widget.textController.error != null) ...[_buildErrorText(data)],
-          SizedBox(
-            height: ResponsiveHelper.responsiveSpacing(
-              data: data,
-              mobile: 24.0,
-              tablet: 30.0,
-              desktop: 36.0,
-            ),
-          ),
-        ],
-      ),
+            8.verticalSpace,
+            if (widget.textController.error != null) ...[_buildErrorText(data)],
+            Spacer(),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildErrorText(ResponsiveData data) {
     return Container(
-      width: double.infinity,
+
       padding: EdgeInsets.symmetric(
         vertical: ResponsiveHelper.responsiveSpacing(
           data: data,

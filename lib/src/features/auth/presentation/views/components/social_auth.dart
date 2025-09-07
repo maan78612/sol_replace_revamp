@@ -1,13 +1,10 @@
 part of 'package:sol_replace_revamp/src/features/auth/auth_library.dart';
 
-class _SocialAuth extends ConsumerWidget {
-  final ChangeNotifierProvider<_AuthVm> authVmProvider;
-
-  const _SocialAuth(this.authVmProvider);
+class _SocialAuth extends StatelessWidget {
+  const _SocialAuth();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final vm = ref.watch(authVmProvider);
+  Widget build(BuildContext context) {
 
     return ResponsiveWidget(
       builder: (context, data) {
@@ -49,14 +46,14 @@ class _SocialAuth extends ConsumerWidget {
                 desktop: 42.0,
               ),
             ),
-            _socialLoginButtons(vm, data),
+            _socialLoginButtons(context, data),
           ],
         );
       },
     );
   }
 
-  Widget _socialLoginButtons(_AuthVm vm, ResponsiveData data) {
+  Widget _socialLoginButtons(BuildContext context, ResponsiveData data) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -64,7 +61,7 @@ class _SocialAuth extends ConsumerWidget {
         _buildSocialButton(
           imagePath: AppIcons.facebook,
           onTap: () {
-            vm.signInWithFacebook();
+            context.read<AuthBloc>().add(const SignInWithFacebook());
           },
           data: data,
         ),
@@ -72,7 +69,7 @@ class _SocialAuth extends ConsumerWidget {
         _buildSocialButton(
           imagePath: AppIcons.gmail,
           onTap: () {
-            vm.signInWithGoogle();
+            context.read<AuthBloc>().add(const SignInWithGoogle());
           },
           data: data,
         ),

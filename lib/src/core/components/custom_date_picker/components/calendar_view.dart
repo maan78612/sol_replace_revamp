@@ -76,7 +76,7 @@ class _CalendarViewState extends State<_CalendarView> {
                   },
                   child: Icon(
                     Icons.chevron_left,
-                    color: AppColors.whiteColor,
+                    color: AppColors.blackColor,
                     size: ResponsiveHelper.adaptiveIconSize(
                       data: data,
                       baseSize: 24.0,
@@ -95,9 +95,9 @@ class _CalendarViewState extends State<_CalendarView> {
                       });
                     },
                     itemToString: (month) => _getMonthName(month),
-                    backgroundColor: AppColors.blackColor,
-                    textColor: AppColors.whiteColor,
-                    iconColor: AppColors.whiteColor,
+                    backgroundColor: AppColors.whiteColor,
+                    textColor: AppColors.blackColor,
+                    iconColor: AppColors.blackColor,
                     borderRadius: ResponsiveHelper.responsiveRadius(
                       data: data,
                       mobile: 8.0,
@@ -132,9 +132,9 @@ class _CalendarViewState extends State<_CalendarView> {
                       });
                     },
                     itemToString: (year) => year.toString(),
-                    backgroundColor: AppColors.blackColor,
-                    textColor: AppColors.whiteColor,
-                    iconColor: AppColors.whiteColor,
+                    backgroundColor: AppColors.whiteColor,
+                    textColor: AppColors.blackColor,
+                    iconColor: AppColors.blackColor,
                     borderRadius: ResponsiveHelper.responsiveRadius(
                       data: data,
                       mobile: 8.0,
@@ -168,7 +168,7 @@ class _CalendarViewState extends State<_CalendarView> {
                   },
                   child: Icon(
                     Icons.chevron_right,
-                    color: AppColors.whiteColor,
+                    color: AppColors.blackColor,
                     size: ResponsiveHelper.adaptiveIconSize(
                       data: data,
                       baseSize: 24.0,
@@ -197,14 +197,7 @@ class _CalendarViewState extends State<_CalendarView> {
                 );
               }).toList(),
             ),
-            SizedBox(
-              height: ResponsiveHelper.responsiveSpacing(
-                data: data,
-                mobile: 8.0,
-                tablet: 10.0,
-                desktop: 12.0,
-              ),
-            ),
+           8.verticalSpace,
 
             // Calendar grid
             ..._buildCalendarDays(data),
@@ -293,10 +286,10 @@ class _CalendarViewState extends State<_CalendarView> {
                       scaleFactor: 1.0,
                     ),
                     color: isDisabled
-                        ? AppColors.lightGreyColor
+                        ? AppColors.greyColor
                         : isSelected
-                        ? AppColors.blackColor
-                        : AppColors.whiteColor,
+                        ? AppColors.whiteColor
+                        : AppColors.blackColor,
                   ),
                 ),
               ),

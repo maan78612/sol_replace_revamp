@@ -148,30 +148,35 @@ class _CustomInputFieldState extends State<CustomInputField> {
   Widget build(BuildContext context) {
     return ResponsiveWidget(
       builder: (context, data) => LayoutBuilder(
-        builder: (context, constraints) => ValueListenableBuilder<bool>(
-          valueListenable: widget.controller.hasFocusNotifier,
-          builder: (context, hasFocus, _) {
-            final fieldWidth =
-                InputFieldDimensionsCalculator.calculateFieldWidth(
-                  data,
-                  constraints.maxWidth,
-                );
-
-            return ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: fieldWidth),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (_shouldShowTitle()) ...[
-                    _buildTitleSection(data, fieldWidth),
-                    _buildTitleSpacing(data),
-                  ],
-                  _buildTextField(hasFocus, data, fieldWidth),
+        builder: (context, constraints) {
+          // Cache calculated values to avoid recalculation
+          final fieldWidth = InputFieldDimensionsCalculator.calculateFieldWidth(
+            data,
+            constraints.maxWidth,
+          );
+          final showTitle = _shouldShowTitle();
+          
+          return ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: fieldWidth),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (showTitle) ...[
+                  _buildTitleSection(data, fieldWidth),
+                  _buildTitleSpacing(data),
                 ],
-              ),
-            );
-          },
-        ),
+                // Use AnimatedBuilder for better performance than ValueListenableBuilder
+                AnimatedBuilder(
+                  animation: widget.controller.focusNode,
+                  builder: (context, _) {
+                    final hasFocus = widget.controller.focusNode.hasFocus;
+                    return _buildTextField(hasFocus, data, fieldWidth);
+                  },
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -390,7 +395,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
       hintText: widget.hint,
       labelText: widget.label,
       labelStyle: TextStyle(
-        color: hasFocus ? AppColors.primaryColor : AppColors.whiteColor,
+        color: hasFocus ? AppColors.primaryColor : AppColors.blackColor,
       ),
       hintStyle:
           widget.hintStyle ??
@@ -415,6 +420,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
           ),
       filled: widget.isFilled,
       fillColor: widget.fillColor,
+      hoverColor: Colors.transparent,
       focusColor: widget.focusColor ?? AppColors.primaryColor,
 
       // Borders
@@ -603,11 +609,11 @@ class _CustomInputFieldState extends State<CustomInputField> {
         color: AppColors.primaryColor,
       ),
       child: Padding(
-        padding: EdgeInsets.all(size / 6),
+        padding: EdgeInsets.all(size / 5),
         child: SvgPicture.asset(
           widget.titleIcon!,
           colorFilter: const ColorFilter.mode(
-            AppColors.blackColor,
+            AppColors.whiteColor,
             BlendMode.srcIn,
           ),
         ),
@@ -637,10 +643,10 @@ class InputFieldDimensionsCalculator {
     // For tablet and desktop, use a percentage of the available container width
     return ResponsiveHelper.value<double>(
       data: data,
-      mobile: availableWidth,
-      mobileLarge: availableWidth * 0.8,
+      mobile: availableWidth* 0.9,
+      mobileLarge: availableWidth * 0.9,
       tablet: availableWidth * 0.65,
-      tabletLarge: availableWidth * 0.6,
+      tabletLarge: availableWidth * 0.65,
       desktop: availableWidth * 0.7,
       desktopLarge: availableWidth * 0.65,
       ultraWide: availableWidth * 0.65,

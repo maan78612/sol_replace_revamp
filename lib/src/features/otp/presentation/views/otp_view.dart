@@ -1,30 +1,17 @@
-// otp_view.dart
-import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+part of 'package:sol_replace_revamp/src/features/otp/otp_library.dart';
 
-import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:sol_replace_revamp/src/core/components/custom_button.dart';
-import 'package:sol_replace_revamp/src/core/constants/colors.dart';
-import 'package:sol_replace_revamp/src/core/constants/fonts.dart';
-import 'package:sol_replace_revamp/src/features/otp/domain/repositories/otp_repository.dart';
-import 'package:sol_replace_revamp/src/features/otp/presentation/viewmodels/otp_viewmodel.dart';
-
-class OtpView extends ConsumerStatefulWidget {
-  final OtpRepository repo;
+class OtpView extends StatefulWidget {
   final String email;
-  final Function() onValidate;
+  final VoidCallback onValidate;
   final String description;
   final String backToText;
-  final Function() backToTab;
+  final VoidCallback backToTab;
   final bool sendInitialOtpCall;
   final String buttonText;
+  final OtpRepository? repo; // Optional custom repository
 
   const OtpView({
     super.key,
-    required this.repo,
     required this.email,
     required this.onValidate,
     required this.description,
@@ -32,55 +19,65 @@ class OtpView extends ConsumerStatefulWidget {
     required this.backToTab,
     required this.sendInitialOtpCall,
     required this.buttonText,
+    this.repo, // Optional - will use default if not provided
   });
 
   @override
-  ConsumerState<OtpView> createState() => _OtpViewState();
+  State<OtpView> createState() => _OtpViewState();
 }
 
-class _OtpViewState extends ConsumerState<OtpView> {
-  late ChangeNotifierProvider<OtpVM> _otpProvider;
+class _OtpViewState extends State<OtpView> {
+  late TextEditingController _otpController;
 
   @override
   void initState() {
-    _otpProvider = ChangeNotifierProvider<OtpVM>((ref) {
-      return OtpVM(
-        repo: widget.repo,
-        email: widget.email,
-        onValidate: widget.onValidate,
-        sendInitialOtpCall: widget.sendInitialOtpCall,
-      );
-    });
     super.initState();
+    _otpController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _otpController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final vm = ref.watch(_otpProvider);
-
-    return Scaffold(
-      backgroundColor: AppColors.primaryColor,
-      resizeToAvoidBottomInset: true,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          30.verticalSpace,
-          _buildTitle(widget.description),
-          57.verticalSpace,
-          _buildPinField(vm, context),
-          16.verticalSpace, // small gap
-          _buildResendRow(vm),
-          100.verticalSpace,
-          CustomButton(
-            isEnable: vm.isBtnEnabled,
-            bgColor: AppColors.primaryColor,
-            isLoading: vm.isLoading,
-            onPressed: () => vm.verifyOtp(),
-            title: widget.buttonText,
-          ),
-          27.verticalSpace,
-          _buildBackToText(widget.backToText, widget.backToTab),
-        ],
+    return BlocProvider(
+      create: (context) => OtpBloc(
+        repo: widget.repo ?? ServiceLocator.instance.otpRepository,
+        email: widget.email,
+        onValidate: widget.onValidate,
+        sendInitialOtpCall: widget.sendInitialOtpCall,
+      ),
+      child: Scaffold(
+        backgroundColor: AppColors.primaryColor,
+        resizeToAvoidBottomInset: true,
+        body: BlocBuilder<OtpBloc, OtpState>(
+          builder: (context, state) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                30.verticalSpace,
+                _buildTitle(widget.description),
+                57.verticalSpace,
+                _buildPinField(state, context),
+                16.verticalSpace, // small gap
+                _buildResendRow(state),
+                100.verticalSpace,
+                CustomButton(
+                  isEnable: state.isBtnEnabled,
+                  bgColor: AppColors.primaryColor,
+                  isLoading: state.isLoading,
+                  onPressed: () => context.read<OtpBloc>().add(const VerifyOtp()),
+                  title: widget.buttonText,
+                ),
+                27.verticalSpace,
+                _buildBackToText(widget.backToText, widget.backToTab),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -126,18 +123,18 @@ class _OtpViewState extends ConsumerState<OtpView> {
     );
   }
 
-  Widget _buildPinField(OtpVM vm, BuildContext context) {
+  Widget _buildPinField(OtpState state, BuildContext context) {
     return PinCodeTextField(
       // mainAxisAlignment: MainAxisAlignment.start,
       appContext: context,
-      length: vm.pinLengths,
-      controller: vm.otpCodeCont,
+      length: 6,
+      controller: _otpController,
       textStyle: FontStyles.montserratRegular.copyWith(fontSize: 20.sp),
       cursorColor: AppColors.primaryColor,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       keyboardType: TextInputType.number,
       animationDuration: const Duration(milliseconds: 300),
-      onChanged: (_) => vm.onCodeChanged(),
+      onChanged: (code) => context.read<OtpBloc>().add(OtpCodeChanged(code)),
       // separatorBuilder: (ctx, idx) => SizedBox(width: 24.sp),
       pinTheme: PinTheme(
         shape: PinCodeFieldShape.box,
@@ -159,22 +156,23 @@ class _OtpViewState extends ConsumerState<OtpView> {
     );
   }
 
-  Widget _buildResendRow(OtpVM vm) {
+  Widget _buildResendRow(OtpState state) {
     return RichText(
       text: TextSpan(
         style: FontStyles.montserratRegular.copyWith(fontSize: 14.sp),
         children: [
           TextSpan(text: "Didn't get a code?"),
-          if (vm.isResend && !vm.isResendLoading)
+          if (state.isResend && !state.isResendLoading)
             TextSpan(
               text: 'Resend',
               style: FontStyles.montserratRegular.copyWith(
                 color: AppColors.primaryColor,
               ),
-              recognizer: TapGestureRecognizer()..onTap = () => vm.sendOtp(),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () => context.read<OtpBloc>().add(const SendOtp()),
             ),
-          if (!vm.isResend) TextSpan(text: ' ${vm.secs}s'),
-          if (vm.isResendLoading)
+          if (!state.isResend) TextSpan(text: ' ${state.secs}s'),
+          if (state.isResendLoading)
             WidgetSpan(
               child: Container(
                 margin: EdgeInsets.only(left: 4),
