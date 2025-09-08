@@ -49,7 +49,7 @@ class SendEmailView extends StatelessWidget {
 
   Widget _sideLogo(BuildContext context, ResponsiveData data) {
     return Container(
-      height: data.height,
+      height: data.height * 0.7,
       padding: ResponsiveHelper.responsivePadding(data),
       child: Center(
         child: ConstrainedBox(
@@ -71,8 +71,7 @@ class SendEmailView extends StatelessWidget {
           ),
           child: SvgPicture.asset(
             AppIcons.logo,
-            placeholderBuilder: (context) =>
-                const CircularProgressIndicator(),
+            placeholderBuilder: (context) => const CircularProgressIndicator(),
             fit: BoxFit.contain,
           ),
         ),

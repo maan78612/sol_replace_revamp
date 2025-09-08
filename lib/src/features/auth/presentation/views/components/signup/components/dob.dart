@@ -10,103 +10,38 @@ class _DOBPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return ResponsiveWidget(
       builder: (context, data) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            CommonInkWell(
-              onTap: () async {
-                await DialogBoxUtils.show(
-                  CustomDatePicker(
-                    firstDate: DateTime(1920),
-                    lastDate: DateTime.now(),
-                    fieldHintText: 'dd/mm/yyyy',
-                    fieldLabelText: 'Enter date (dd/mm/yyyy)',
-                    suffixWidget: _suffixIcon(),
-                    onDateSelected: (date) {
-                      setDate(date);
-                    },
-                  ),
-                );
-              },
-              child: CustomInputField(
-                title: 'Enter your birthday',
-                titleIcon: AppIcons.calendar,
-                hint: 'DD / MM / YYYY',
-                enabled: false,
-                textInputAction: TextInputAction.next,
-                controller: controller,
+        return CommonInkWell(
+          onTap: () async {
+            await DialogBoxUtils.show(
+              CustomDatePicker(
+                firstDate: DateTime(1920),
+                lastDate: DateTime.now(),
+                fieldHintText: 'dd/mm/yyyy',
+                fieldLabelText: 'Enter date (dd/mm/yyyy)',
                 suffixWidget: _suffixIcon(),
-                textStyle: FontStyles.montserratMedium.copyWith(
-                  fontSize: ResponsiveHelper.adaptiveFontSize(
-                    data: data,
-                    baseSize: 14.0,
-                    scaleFactor: 1.0,
-                  ),
-                  color: AppColors.blackColor,
-                ),
+                onDateSelected: (date) {
+                  setDate(date);
+                },
               ),
+            );
+          },
+          child: CustomInputField(
+            title: 'Enter ',
+            titleIcon: AppIcons.calendar,
+            hint: 'DD / MM / YYYY',
+            enabled: false,
+            textInputAction: TextInputAction.next,
+            controller: controller,
+            suffixWidget: _suffixIcon(),
+            textStyle: FontStyles.montserratMedium.copyWith(
+              fontSize: ResponsiveHelper.adaptiveFontSize(
+                data: data,
+                baseSize: 14.0,
+                scaleFactor: 1.0,
+              ),
+              color: AppColors.blackColor,
             ),
-            12.verticalSpace,
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final fieldWidth =
-                    InputFieldDimensionsCalculator.calculateFieldWidth(
-                      data,
-                      constraints.maxWidth,
-                    );
-
-                return ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: fieldWidth),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text.rich(
-                      textAlign: TextAlign.start,
-                      softWrap: true,
-                      TextSpan(
-                        children: [
-                          WidgetSpan(
-                            child: SvgPicture.asset(
-                              AppIcons.alert,
-                              width: ResponsiveHelper.adaptiveFontSize(
-                                data: data,
-                                baseSize: 14.0,
-                              ),
-                              height: ResponsiveHelper.adaptiveIconSize(
-                                data: data,
-                                baseSize: 14.0,
-                              ),
-                            ),
-                          ),
-                          WidgetSpan(
-                            child: SizedBox(
-                              width: ResponsiveHelper.responsiveSpacing(
-                                data: data,
-                                mobile: 12.0,
-                                tablet: 14.0,
-                                desktop: 16.0,
-                              ),
-                            ),
-                          ),
-                          TextSpan(
-                            text:
-                                'You must be at least 18 years old to register',
-                            style: FontStyles.montserratRegular.copyWith(
-                              fontSize: ResponsiveHelper.adaptiveFontSize(
-                                data: data,
-                                baseSize: 14.0,
-                                scaleFactor: 0.7,
-                              ),
-                              color: AppColors.blackColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ],
+          ),
         );
       },
     );

@@ -103,7 +103,7 @@ class CustomInputField extends StatefulWidget {
     this.textStyle,
     this.hintStyle,
     // Dimensions
-    this.titleFontSize = 16,
+    this.titleFontSize = 14,
     this.subTitleFontSize = 12,
     this.titleIconSize = 24,
     this.prefixMaxHeight = 20,
@@ -201,7 +201,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
           if (widget.title != null)
             Text(
               widget.title!,
-              style: FontStyles.montserratBold.copyWith(
+              style: FontStyles.montserratSemiBold.copyWith(
                 fontSize: ResponsiveHelper.adaptiveFontSize(
                   data: data,
                   baseSize: widget.titleFontSize,

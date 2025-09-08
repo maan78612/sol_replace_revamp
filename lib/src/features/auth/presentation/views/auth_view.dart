@@ -22,7 +22,7 @@ class AuthView extends StatelessWidget {
         ),
       ],
       child: Scaffold(
-        backgroundColor: AppColors.whiteColor,
+        backgroundColor: AppColors.offWhiteColor,
         body: ResponsiveWidget(
           builder: (context, data) => _body(context, data),
         ),
@@ -30,40 +30,54 @@ class AuthView extends StatelessWidget {
     );
   }
 
-
-
   Widget _body(BuildContext context, ResponsiveData data) {
-    return Row(
+    return Column(
       children: [
-        // Left side illustration (only for desktop)
-        if (data.isDesktopRange) ...[
-          Expanded(
-            flex: ResponsiveHelper.value<int>(
-              data: data,
-              tablet: 1,
-              desktop: 2,
-              desktopLarge: 3,
-              fallback: 1,
-            ),
-            child: _sideLogo(context, data),
+        Container(
+          margin: EdgeInsets.only(left: 20, top: 20),
+          height: 50.h,
+          child: SvgPicture.asset(
+            AppIcons.logoHorizontal,
+            fit: BoxFit.contain,
+            alignment: data.isDesktopRange
+                ? Alignment.topLeft
+                : Alignment.topCenter,
           ),
-        ],
-
-        // Right side form
+        ),
         Expanded(
-          flex: ResponsiveHelper.value<int>(
-            data: data,
-            tablet: 2,
-            desktop: 3,
-            desktopLarge: 2,
-            fallback: 1,
+          child: Row(
+            children: [
+              // Left side illustration (only for desktop)
+              if (data.isDesktopRange) ...[
+                Expanded(
+                  flex: ResponsiveHelper.value<int>(
+                    data: data,
+                    tablet: 1,
+                    desktop: 2,
+                    desktopLarge: 4,
+                    fallback: 1,
+                  ),
+                  child: _sideLogo(context, data),
+                ),
+              ],
+
+              // Right side form
+              Expanded(
+                flex: ResponsiveHelper.value<int>(
+                  data: data,
+                  tablet: 2,
+                  desktop: 3,
+                  desktopLarge: 5,
+                  fallback: 1,
+                ),
+                child: _buildFormSection(context, data),
+              ),
+            ],
           ),
-          child: _buildFormSection(context, data),
         ),
       ],
     );
   }
-
 
   Widget _buildTermsText(ResponsiveData data) {
     final fontSize = ResponsiveHelper.adaptiveFontSize(
@@ -78,7 +92,7 @@ class AuthView extends StatelessWidget {
           textAlign: TextAlign.center,
           text: TextSpan(
             text:
-            "By ${state.authType == AuthType.login ? "login" : "signup"} in you are agreeing our\n",
+                "By ${state.authType == AuthType.login ? "login" : "signup"} in you are agreeing our\n",
             style: FontStyles.montserratRegular.copyWith(
               fontSize: fontSize,
               color: AppColors.blackColor,
@@ -104,6 +118,7 @@ class AuthView extends StatelessWidget {
       },
     );
   }
+
   Widget _sideLogo(BuildContext context, ResponsiveData data) {
     return Container(
       height: data.height,
@@ -146,8 +161,8 @@ class AuthView extends StatelessWidget {
   Widget _buildFormSection(BuildContext context, ResponsiveData data) {
     final elevation = ResponsiveHelper.value<double>(
       data: data,
-      mobile: 0.0,
-      tablet: 8.0,
+      mobile: 12.0,
+      tablet: 12.0,
       desktop: 12.0,
       desktopLarge: 16.0,
       ultraWide: 20.0,
@@ -157,18 +172,21 @@ class AuthView extends StatelessWidget {
     return Card(
       color: AppColors.whiteColor,
       elevation: elevation,
-      margin: EdgeInsets.zero,
+      margin: EdgeInsets.only(
+        bottom: 40.h,
+        top: data.isDesktopRange ? 0 : 40.h,
+        right: 20.w,
+        left: !data.isDesktopRange ? 20.w : 0,
+      ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(
-          data.isTabletRange || data.isDesktopRange
-              ? ResponsiveHelper.responsiveRadius(
-                  data: data,
-                  mobile: 8.0,
-                  tablet: 10.0,
-                  desktop: 12.0,
-                  ultraWide: 16.0,
-                )
-              : 0,
+          ResponsiveHelper.responsiveRadius(
+            data: data,
+            mobile: 8.0,
+            tablet: 10.0,
+            desktop: 12.0,
+            ultraWide: 16.0,
+          ),
         ),
       ),
       child: SizedBox(
@@ -180,9 +198,10 @@ class AuthView extends StatelessWidget {
             children: [
               40.verticalSpace,
               const _Switcher(),
+              50.verticalSpace,
               _buildAuthCard(context, data),
               30.verticalSpace,
-              const _SocialAuth(),
+              // const _SocialAuth(),
               20.verticalSpace,
               _buildTermsText(data),
               30.verticalSpace,
@@ -198,7 +217,6 @@ class AuthView extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        40.verticalSpace,
         BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
             return state.authType == AuthType.login

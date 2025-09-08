@@ -17,5 +17,6 @@ class AppIcons {
   static const String alert = "assets/icons/alert.svg";
   static const String sendEmail = "assets/icons/send_email.svg";
   static const String forgetPassword = "assets/icons/forget_password.svg";
+  static const String logoHorizontal = "assets/icons/logo_horizontal.svg";
 
 }

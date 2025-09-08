@@ -9,39 +9,83 @@ class _PasswordForm extends StatelessWidget {
       builder: (context, data) {
         return BlocBuilder<SignUpBloc, SignUpState>(
           builder: (context, state) {
-            return Column(
-              children: [
-                CustomInputField(
-                  title: 'Password',
-                  titleIcon: AppIcons.lock,
-                  hint: 'Enter your password.',
-                  obscure: true,
-                  textInputAction: TextInputAction.next,
-                  controller: state.passwordController,
-                  onChange: (value) {
-                    context.read<SignUpBloc>().add(SignUpPasswordChanged(value));
-                  },
-                ),
-                30.verticalSpace,
-                CustomInputField(
-                  title: 'Confirm Password',
-                  titleIcon: AppIcons.lock,
-                  hint: 'Enter your password.',
-                  obscure: true,
-                  textInputAction: TextInputAction.done,
-                  controller: state.confirmPasswordController,
-                  onChange: (value) {
-                    context.read<SignUpBloc>().add(SignUpConfirmPasswordChanged(value));
-                  },
-                ),
-
-                if (state.shouldShowPasswordValidation)
-                  _passwordValidator(state),
-              ],
-            );
+            return data.isTabletRange || data.isDesktopRange
+                ? _desktopTabLayout(state, context)
+                : _mobileLayout(state, context);
+            _mobileLayout(state, context);
           },
         );
       },
+    );
+  }
+
+  Widget _mobileLayout(SignUpState state, BuildContext context) {
+    return Column(
+      children: [
+        CustomInputField(
+          title: 'Password',
+          titleIcon: AppIcons.lock,
+          hint: 'Enter your password.',
+          obscure: true,
+          textInputAction: TextInputAction.next,
+          controller: state.passwordController,
+          onChange: (value) {
+            context.read<SignUpBloc>().add(SignUpPasswordChanged(value));
+          },
+        ),
+        30.verticalSpace,
+        CustomInputField(
+          title: 'Confirm Password',
+          titleIcon: AppIcons.lock,
+          hint: 'Enter your password.',
+          obscure: true,
+          textInputAction: TextInputAction.done,
+          controller: state.confirmPasswordController,
+          onChange: (value) {
+            context.read<SignUpBloc>().add(SignUpConfirmPasswordChanged(value));
+          },
+        ),
+
+        if (state.shouldShowPasswordValidation) _passwordValidator(state),
+      ],
+    );
+  }
+
+  Widget _desktopTabLayout(SignUpState state, BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: CustomInputField(
+            title: 'Password',
+            titleIcon: AppIcons.lock,
+            hint: 'Enter your password.',
+            obscure: true,
+            textInputAction: TextInputAction.next,
+            controller: state.passwordController,
+            onChange: (value) {
+              context.read<SignUpBloc>().add(SignUpPasswordChanged(value));
+            },
+          ),
+        ),
+        7.horizontalSpace,
+        Expanded(
+          child: CustomInputField(
+            title: 'Confirm Password',
+            titleIcon: AppIcons.lock,
+            hint: 'Enter your password.',
+            obscure: true,
+            textInputAction: TextInputAction.done,
+            controller: state.confirmPasswordController,
+            onChange: (value) {
+              context.read<SignUpBloc>().add(
+                SignUpConfirmPasswordChanged(value),
+              );
+            },
+          ),
+        ),
+
+        if (state.shouldShowPasswordValidation) _passwordValidator(state),
+      ],
     );
   }
 
@@ -81,7 +125,10 @@ class _PasswordForm extends StatelessWidget {
 
         _buildValidationRow('At least 8 characters', state.hasMinLength),
         4.verticalSpace,
-        _buildValidationRow('At least one uppercase letter', state.hasUppercase),
+        _buildValidationRow(
+          'At least one uppercase letter',
+          state.hasUppercase,
+        ),
         4.verticalSpace,
         _buildValidationRow(
           'At least one special character',
