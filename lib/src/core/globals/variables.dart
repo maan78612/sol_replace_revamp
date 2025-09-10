@@ -12,6 +12,6 @@ double inputFieldHeight(ResponsiveData data) =>
       desktop: 50.0,
     );
 
-double hMargin = 24.w;
+double hMargin = 18.w;
 
 final GlobalKey<NavigatorState> materialAppKey = GlobalKey<NavigatorState>();

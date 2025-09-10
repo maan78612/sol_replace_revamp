@@ -9,17 +9,27 @@ class _PasswordForm extends StatelessWidget {
       builder: (context, data) {
         return BlocBuilder<SignUpBloc, SignUpState>(
           builder: (context, state) {
-            return data.isTabletRange || data.isDesktopRange
-                ? _desktopTabLayout(state, context)
-                : _mobileLayout(state, context);
-            _mobileLayout(state, context);
+            return Column(
+              children: [
+                data.isTabletRange || data.isDesktopRange
+                    ? _desktopTabLayout(state, context, data)
+                    : _mobileLayout(state, context, data),
+
+                if (state.shouldShowPasswordValidation)
+                  _passwordValidator(state, data),
+              ],
+            );
           },
         );
       },
     );
   }
 
-  Widget _mobileLayout(SignUpState state, BuildContext context) {
+  Widget _mobileLayout(
+    SignUpState state,
+    BuildContext context,
+    ResponsiveData data,
+  ) {
     return Column(
       children: [
         CustomInputField(
@@ -45,13 +55,15 @@ class _PasswordForm extends StatelessWidget {
             context.read<SignUpBloc>().add(SignUpConfirmPasswordChanged(value));
           },
         ),
-
-        if (state.shouldShowPasswordValidation) _passwordValidator(state),
       ],
     );
   }
 
-  Widget _desktopTabLayout(SignUpState state, BuildContext context) {
+  Widget _desktopTabLayout(
+    SignUpState state,
+    BuildContext context,
+    ResponsiveData data,
+  ) {
     return Row(
       children: [
         Expanded(
@@ -83,78 +95,112 @@ class _PasswordForm extends StatelessWidget {
             },
           ),
         ),
-
-        if (state.shouldShowPasswordValidation) _passwordValidator(state),
       ],
     );
   }
 
-  Widget _passwordValidator(SignUpState state) {
-    return Column(
-      children: [
-        24.verticalSpace,
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(6, (index) {
-            // Determine which validation group this index belongs to
-            bool isActive;
-            if (index < 2) {
-              // First two containers for min length
-              isActive = state.hasMinLength;
-            } else if (index < 4) {
-              // Next two containers for uppercase
-              isActive = state.hasUppercase;
-            } else {
-              // Last two containers for special character
-              isActive = state.hasSpecialChar;
-            }
-
-            return Container(
-              height: 3.5.h,
-              width: 50.w,
-              margin: const EdgeInsets.only(right: 5),
-              decoration: BoxDecoration(
-                color: isActive ? AppColors.primaryColor : Colors.grey,
-                borderRadius: BorderRadius.circular(2.r),
+  Widget _passwordValidator(SignUpState state, ResponsiveData data) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: LayoutBuilder(
+        builder: (context, constraints) => SizedBox(
+          width: _getMaxFieldWidth(data, constraints.maxWidth),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              24.verticalSpace,
+              _indicators(data, state),
+              15.verticalSpace,
+              _buildValidationRow(
+                'At least 8 characters',
+                state.hasMinLength,
+                data,
               ),
-            );
-          }),
+              4.verticalSpace,
+              _buildValidationRow(
+                'At least one uppercase letter',
+                state.hasUppercase,
+                data,
+              ),
+              4.verticalSpace,
+              _buildValidationRow(
+                'At least one special character',
+                state.hasSpecialChar,
+                data,
+              ),
+            ],
+          ),
         ),
-        15.verticalSpace,
-
-        _buildValidationRow('At least 8 characters', state.hasMinLength),
-        4.verticalSpace,
-        _buildValidationRow(
-          'At least one uppercase letter',
-          state.hasUppercase,
-        ),
-        4.verticalSpace,
-        _buildValidationRow(
-          'At least one special character',
-          state.hasSpecialChar,
-        ),
-      ],
+      ),
     );
   }
 
-  Widget _buildValidationRow(String text, bool isValid) {
+  Widget _indicators(ResponsiveData data, SignUpState state) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+
+      children: List.generate(6, (index) {
+        bool isActive;
+        if (index < 2) {
+          isActive = state.hasMinLength;
+        } else if (index < 4) {
+          isActive = state.hasUppercase;
+        } else {
+          isActive = state.hasSpecialChar;
+        }
+
+        return Expanded(
+          child: Container(
+            height: 3.5.h,
+
+            margin: const EdgeInsets.only(right: 5),
+            decoration: BoxDecoration(
+              color: isActive ? AppColors.primaryColor : Colors.grey,
+              borderRadius: BorderRadius.circular(2.r),
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildValidationRow(String text, bool isValid, ResponsiveData data) {
     return Row(
       children: [
         Icon(
           isValid ? Icons.check : Icons.close,
-          size: 18.sp,
+          size: ResponsiveHelper.adaptiveIconSize(data: data, baseSize: 18),
           color: isValid ? AppColors.primaryColor : AppColors.redColor,
         ),
         8.horizontalSpace,
         Text(
           text,
           style: FontStyles.montserratRegular.copyWith(
-            fontSize: 14.sp,
-            color: AppColors.whiteColor,
+            fontSize: ResponsiveHelper.adaptiveFontSize(
+              data: data,
+              baseSize: 14.0,
+              scaleFactor: 0.8,
+            ),
+            color: AppColors.blackColor,
           ),
         ),
       ],
+    );
+  }
+
+  double _getMaxFieldWidth(ResponsiveData data, double availableWidth) {
+    return ResponsiveHelper.value<double>(
+      data: data,
+      mobile: data.width * 0.5,
+      mobileLarge: data.width * 0.5,
+      tablet: data.width * 0.4,
+      tabletLarge: data.width * 0.4,
+      desktop: data.width * 0.2,
+      desktopLarge: data.width * 0.2,
+      ultraWide: data.width * 0.2,
+      fallback: availableWidth,
     );
   }
 }

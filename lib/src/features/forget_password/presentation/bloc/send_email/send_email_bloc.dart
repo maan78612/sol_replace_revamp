@@ -1,42 +1,18 @@
 part of 'package:sol_replace_revamp/src/features/forget_password/forget_password_library.dart';
 
-// Internal event for debounced validation
-class _ValidateForm extends SendEmailEvent {
-  const _ValidateForm();
-}
-
 class SendEmailBloc extends Bloc<SendEmailEvent, SendEmailState> {
-  Timer? _debounceTimer;
-  
-  // Debounce duration for form validation
-  static const Duration _debounceDuration = Duration(milliseconds: 300);
-
   SendEmailBloc() : super(SendEmailState.initial()) {
     on<SendEmailChanged>(_onEmailChanged);
     on<SendEmailSubmitted>(_onSendEmailSubmitted);
-    on<_ValidateForm>(_onValidateForm);
   }
 
   void _onEmailChanged(SendEmailChanged event, Emitter<SendEmailState> emit) {
     final emailError = TextFieldValidator.validateEmail(event.email);
     state.emailController.error = emailError;
     
-    // Debounce form validation to reduce unnecessary state emissions
-    _debounceValidation();
-  }
-  
-  void _debounceValidation() {
-    _debounceTimer?.cancel();
-    _debounceTimer = Timer(_debounceDuration, () {
-      add(const _ValidateForm());
-    });
-  }
-  
-  void _onValidateForm(_ValidateForm event, Emitter<SendEmailState> emit) {
+    // Immediate form validation
     final isFormValid = _validateForm();
-    if (state.isFormValid != isFormValid) {
-      emit(state.copyWith(isFormValid: isFormValid, errorMessage: null));
-    }
+    emit(state.copyWith(isFormValid: isFormValid, errorMessage: null));
   }
 
   Future<void> _onSendEmailSubmitted(
@@ -94,7 +70,6 @@ class SendEmailBloc extends Bloc<SendEmailEvent, SendEmailState> {
 
   @override
   Future<void> close() {
-    _debounceTimer?.cancel();
     state.emailController.controller.dispose();
     state.emailController.focusNode.dispose();
     state.emailController.hasFocusNotifier.dispose();

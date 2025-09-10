@@ -162,15 +162,25 @@ class _CustomInputFieldState extends State<CustomInputField> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (showTitle) ...[
-                  _buildTitleSection(data, fieldWidth),
+                  ValueListenableBuilder<String?>(
+                    valueListenable: widget.controller.errorNotifier,
+                    builder: (context, error, _) {
+                      return _buildTitleSection(data, fieldWidth);
+                    },
+                  ),
                   _buildTitleSpacing(data),
                 ],
-                // Use AnimatedBuilder for better performance than ValueListenableBuilder
-                AnimatedBuilder(
-                  animation: widget.controller.focusNode,
-                  builder: (context, _) {
-                    final hasFocus = widget.controller.focusNode.hasFocus;
-                    return _buildTextField(hasFocus, data, fieldWidth);
+                // Listen to both focus and error changes
+                ValueListenableBuilder<String?>(
+                  valueListenable: widget.controller.errorNotifier,
+                  builder: (context, error, _) {
+                    return AnimatedBuilder(
+                      animation: widget.controller.focusNode,
+                      builder: (context, _) {
+                        final hasFocus = widget.controller.focusNode.hasFocus;
+                        return _buildTextField(hasFocus, data, fieldWidth);
+                      },
+                    );
                   },
                 ),
               ],
@@ -643,8 +653,8 @@ class InputFieldDimensionsCalculator {
     // For tablet and desktop, use a percentage of the available container width
     return ResponsiveHelper.value<double>(
       data: data,
-      mobile: availableWidth* 0.9,
-      mobileLarge: availableWidth * 0.9,
+      mobile: availableWidth,
+      mobileLarge: availableWidth,
       tablet: availableWidth * 0.65,
       tabletLarge: availableWidth * 0.65,
       desktop: availableWidth * 0.7,

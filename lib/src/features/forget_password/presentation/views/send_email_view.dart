@@ -182,19 +182,24 @@ class SendEmailView extends StatelessWidget {
     required CustomTextController con,
     required ResponsiveData data,
   }) {
-    return (con.controller.text.isNotEmpty)
-        ? Icon(
-            con.error != null ? Icons.close : Icons.check,
-            color: con.error != null
-                ? AppColors.redColor
-                : AppColors.primaryColor,
-            size: ResponsiveHelper.responsiveHeight(
-              data: data,
-              mobile: 20.0,
-              tablet: 22.0,
-              desktop: 24.0,
-            ),
-          )
-        : null;
+    return ValueListenableBuilder<String?>(
+      valueListenable: con.errorNotifier,
+      builder: (context, error, _) {
+        return (con.controller.text.isNotEmpty)
+            ? Icon(
+                error != null ? Icons.close : Icons.check,
+                color: error != null
+                    ? AppColors.redColor
+                    : AppColors.primaryColor,
+                size: ResponsiveHelper.responsiveHeight(
+                  data: data,
+                  mobile: 20.0,
+                  tablet: 22.0,
+                  desktop: 24.0,
+                ),
+              )
+            : const SizedBox.shrink();
+      },
+    );
   }
 }

@@ -9,79 +9,88 @@ class _LoginComponent extends StatelessWidget {
       builder: (context, data) {
         return BlocBuilder<LoginBloc, LoginState>(
           builder: (context, state) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                CustomInputField(
-                  hint: 'Email',
-                  title: 'Enter your email.',
-                  titleIcon: AppIcons.email,
-                  textInputAction: TextInputAction.next,
-                  keyboardType: TextInputType.emailAddress,
-                  controller: state.emailController,
-                  onChange: (value) {
-                    context.read<LoginBloc>().add(LoginEmailChanged(value));
-                  },
-                  suffixWidget: _getSuffixIcon(
-                    con: state.emailController,
-                    data: data,
+            return Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: data.isTabletRange || data.isDesktopRange
+                    ? 0
+                    : hMargin,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CustomInputField(
+                    hint: 'Email',
+                    title: 'Enter your email.',
+                    titleIcon: AppIcons.email,
+                    textInputAction: TextInputAction.next,
+                    keyboardType: TextInputType.emailAddress,
+                    controller: state.emailController,
+                    onChange: (value) {
+                      context.read<LoginBloc>().add(LoginEmailChanged(value));
+                    },
+                    suffixWidget: _getSuffixIcon(
+                      con: state.emailController,
+                      data: data,
+                    ),
                   ),
-                ),
-                30.verticalSpace,
-                CustomInputField(
-                  title: 'Password',
-                  hint: 'Enter your password.',
-                  titleIcon: AppIcons.lock,
-                  obscure: true,
-                  textInputAction: TextInputAction.done,
-                  controller: state.passwordController,
-                  onChange: (value) {
-                    context.read<LoginBloc>().add(LoginPasswordChanged(value));
-                  },
-                ),
+                  30.verticalSpace,
+                  CustomInputField(
+                    title: 'Password',
+                    hint: 'Enter your password.',
+                    titleIcon: AppIcons.lock,
+                    obscure: true,
+                    textInputAction: TextInputAction.done,
+                    controller: state.passwordController,
+                    onChange: (value) {
+                      context.read<LoginBloc>().add(
+                        LoginPasswordChanged(value),
+                      );
+                    },
+                  ),
 
-                GestureDetector(
-                  onTap: () => _navigateToForgetPassword(context),
-                  child: Align(
-                    alignment: Alignment.bottomRight,
-                    child: Padding(
-                      padding: EdgeInsets.all(
-                        ResponsiveHelper.responsiveWidth(
-                          data: data,
-                          mobile: 8.0,
-                          tablet: 10.0,
-                          desktop: 12.0,
-                        ),
-                      ),
-                      child: Text(
-                        "Forgot Password?",
-                        style: FontStyles.montserratRegular.copyWith(
-                          fontSize: ResponsiveHelper.adaptiveFontSize(
+                  GestureDetector(
+                    onTap: () => _navigateToForgetPassword(context),
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                        padding: EdgeInsets.all(
+                          ResponsiveHelper.responsiveWidth(
                             data: data,
-                            baseSize: 12.0,
-                            scaleFactor: 0.95,
+                            mobile: 8.0,
+                            tablet: 10.0,
+                            desktop: 12.0,
                           ),
-                          color: AppColors.primaryColor,
-                          decoration: TextDecoration.underline,
+                        ),
+                        child: Text(
+                          "Forgot Password?",
+                          style: FontStyles.montserratRegular.copyWith(
+                            fontSize: ResponsiveHelper.adaptiveFontSize(
+                              data: data,
+                              baseSize: 12.0,
+                              scaleFactor: 0.95,
+                            ),
+                            color: AppColors.primaryColor,
+                            decoration: TextDecoration.underline,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
 
-                _guestText(data),
-                40.verticalSpace,
-                CustomButton(
-                  title: 'LOGIN',
-                  isEnable: state.isFormValid,
-                  onPressed: () =>
-                      context.read<LoginBloc>().add(const LoginSubmitted()),
-                  bgColor: AppColors.primaryColor,
-                  textColor: AppColors.whiteColor,
-                ),
-                30.verticalSpace,
-              ],
+                  _guestText(data),
+                  40.verticalSpace,
+                  CustomButton(
+                    title: 'LOGIN',
+                    isEnable: state.isFormValid,
+                    onPressed: () =>
+                        context.read<LoginBloc>().add(const LoginSubmitted()),
+                    bgColor: AppColors.primaryColor,
+                    textColor: AppColors.whiteColor,
+                  ),
+                  30.verticalSpace,
+                ],
+              ),
             );
           },
         );
@@ -93,14 +102,19 @@ class _LoginComponent extends StatelessWidget {
     required CustomTextController con,
     required ResponsiveData data,
   }) {
-    return (con.controller.text.isNotEmpty)
-        ? Icon(
-            con.error != null ? Icons.close : Icons.check,
-            color: con.error != null
-                ? AppColors.redColor
-                : AppColors.primaryColor,
-          )
-        : null;
+    return ValueListenableBuilder<String?>(
+      valueListenable: con.errorNotifier,
+      builder: (context, error, _) {
+        return (con.controller.text.isNotEmpty)
+            ? Icon(
+                error != null ? Icons.close : Icons.check,
+                color: error != null
+                    ? AppColors.redColor
+                    : AppColors.primaryColor,
+              )
+            : const SizedBox.shrink();
+      },
+    );
   }
 
   void _navigateToForgetPassword(BuildContext context) {

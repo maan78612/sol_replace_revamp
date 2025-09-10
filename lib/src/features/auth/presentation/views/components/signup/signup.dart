@@ -11,7 +11,7 @@ class _SignUpComponent extends StatelessWidget {
           builder: (ctx, state) {
             return data.isTabletRange || data.isDesktopRange
                 ? _desktopTabLayout(state, context)
-                : mobileLayout(state, context);
+                : _mobileLayout(state, context);
           },
         );
       },
@@ -26,161 +26,151 @@ class _SignUpComponent extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: CustomInputField(
-                  hint: "Enter your first name.",
-                  title: 'First Name',
-                  titleIcon: AppIcons.name,
-                  textInputAction: TextInputAction.next,
-                  keyboardType: TextInputType.name,
-                  controller: state.nameController,
-                  onChange: (value) {
-                    context.read<SignUpBloc>().add(SignUpNameChanged(value));
-                  },
-                  suffixWidget: _getSuffixIcon(con: state.nameController),
-                ),
+                child: _firstNameField(state: state, context: context),
               ),
               7.horizontalSpace,
               Expanded(
-                child: CustomInputField(
-                  hint: "Enter your last name.",
-                  title: 'Last Name',
-                  titleIcon: AppIcons.name,
-                  textInputAction: TextInputAction.next,
-                  keyboardType: TextInputType.name,
-                  controller: state.nameController,
-                  onChange: (value) {
-                    context.read<SignUpBloc>().add(SignUpNameChanged(value));
-                  },
-                  suffixWidget: _getSuffixIcon(con: state.nameController),
-                ),
+                child: _lastNameField(state: state, context: context),
               ),
             ],
           ),
-
           30.verticalSpace,
+
           Row(
             children: [
               Expanded(
-                child: CustomInputField(
-                  hint: 'Email',
-                  titleIcon: AppIcons.email,
-                  title: 'Enter your email.',
-                  textInputAction: TextInputAction.next,
-                  keyboardType: TextInputType.emailAddress,
-                  controller: state.emailController,
-                  onChange: (value) {
-                    context.read<SignUpBloc>().add(SignUpEmailChanged(value));
-                  },
-                  suffixWidget: _getSuffixIcon(con: state.emailController),
-                ),
+                child: _emailField(state: state, context: context),
               ),
               7.horizontalSpace,
               Expanded(
-                child: _DOBPicker(
-                  setDate: (DateTime date) {
-                    context.read<SignUpBloc>().add(
-                      SignUpDateOfBirthChanged(date),
-                    );
-                  },
-                  controller: state.dobController,
-                ),
+                child: _dobDatePicker(state: state, context: context),
               ),
             ],
           ),
-
           30.verticalSpace,
           _PasswordForm(),
           40.verticalSpace,
-          CustomButton(
-            isEnable: state.isFormValid,
-            title: "SIGN UP",
-            onPressed: () =>
-                context.read<SignUpBloc>().add(const SignUpSubmitted()),
-            bgColor: AppColors.primaryColor,
-            textColor: AppColors.whiteColor,
-          ),
+          _buildSignUpButton(state: state, context: context),
           30.verticalSpace,
         ],
       ),
     );
   }
 
-  Widget mobileLayout(SignUpState state, BuildContext context) {
+  Widget _mobileLayout(SignUpState state, BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10.w),
+      padding:  EdgeInsets.symmetric(horizontal: hMargin),
       child: Column(
         children: [
-          CustomInputField(
-            hint: "Enter your first name.",
-            title: 'First Name',
-            titleIcon: AppIcons.name,
-            textInputAction: TextInputAction.next,
-            keyboardType: TextInputType.name,
-            controller: state.nameController,
-            onChange: (value) {
-              context.read<SignUpBloc>().add(SignUpNameChanged(value));
-            },
-            suffixWidget: _getSuffixIcon(con: state.nameController),
-          ),
+          _firstNameField(state: state, context: context),
           30.verticalSpace,
-          CustomInputField(
-            hint: "Enter your last name.",
-            title: 'Last Name',
-            titleIcon: AppIcons.name,
-            textInputAction: TextInputAction.next,
-            keyboardType: TextInputType.name,
-            controller: state.nameController,
-            onChange: (value) {
-              context.read<SignUpBloc>().add(SignUpNameChanged(value));
-            },
-            suffixWidget: _getSuffixIcon(con: state.nameController),
-          ),
+          _lastNameField(state: state, context: context),
           30.verticalSpace,
-          CustomInputField(
-            hint: 'Email',
-            titleIcon: AppIcons.email,
-            title: 'Enter your email.',
-            textInputAction: TextInputAction.next,
-            keyboardType: TextInputType.emailAddress,
-            controller: state.emailController,
-            onChange: (value) {
-              context.read<SignUpBloc>().add(SignUpEmailChanged(value));
-            },
-            suffixWidget: _getSuffixIcon(con: state.emailController),
-          ),
+          _emailField(state: state, context: context),
           30.verticalSpace,
-          _DOBPicker(
-            setDate: (DateTime date) {
-              context.read<SignUpBloc>().add(SignUpDateOfBirthChanged(date));
-            },
-            controller: state.dobController,
-          ),
-
+          _dobDatePicker(state: state, context: context),
           30.verticalSpace,
           _PasswordForm(),
           40.verticalSpace,
-          CustomButton(
-            isEnable: state.isFormValid,
-            title: "SIGN UP",
-            onPressed: () =>
-                context.read<SignUpBloc>().add(const SignUpSubmitted()),
-            bgColor: AppColors.primaryColor,
-            textColor: AppColors.whiteColor,
-          ),
+          _buildSignUpButton(state: state, context: context),
           30.verticalSpace,
         ],
       ),
+    );
+  }
+
+  Widget _firstNameField({
+    required SignUpState state,
+    required BuildContext context,
+  }) {
+    return CustomInputField(
+      hint: "Enter your first name.",
+      title: 'First Name',
+      titleIcon: AppIcons.name,
+      textInputAction: TextInputAction.next,
+      keyboardType: TextInputType.name,
+      controller: state.firstNameController,
+      onChange: (value) {
+        context.read<SignUpBloc>().add(SignUpFirstNameChanged(value));
+      },
+      suffixWidget: _getSuffixIcon(con: state.firstNameController),
+    );
+  }
+
+  Widget _lastNameField({
+    required SignUpState state,
+    required BuildContext context,
+  }) {
+    return CustomInputField(
+      hint: "Enter your last name.",
+      title: 'Last Name',
+      titleIcon: AppIcons.name,
+      textInputAction: TextInputAction.next,
+      keyboardType: TextInputType.name,
+      controller: state.lastNameController,
+      onChange: (value) {
+        context.read<SignUpBloc>().add(SignUpLastNameChanged(value));
+      },
+      suffixWidget: _getSuffixIcon(con: state.lastNameController),
+    );
+  }
+
+  Widget _emailField({
+    required SignUpState state,
+    required BuildContext context,
+  }) {
+    return CustomInputField(
+      hint: 'Email',
+      titleIcon: AppIcons.email,
+      title: 'Enter your email.',
+      textInputAction: TextInputAction.next,
+      keyboardType: TextInputType.emailAddress,
+      controller: state.emailController,
+      onChange: (value) {
+        context.read<SignUpBloc>().add(SignUpEmailChanged(value));
+      },
+      suffixWidget: _getSuffixIcon(con: state.emailController),
+    );
+  }
+
+  Widget _dobDatePicker({
+    required SignUpState state,
+    required BuildContext context,
+  }) {
+    return _DOBPicker(
+      setDate: (DateTime date) {
+        context.read<SignUpBloc>().add(SignUpDateOfBirthChanged(date));
+      },
+      controller: state.dobController,
+    );
+  }
+
+  Widget _buildSignUpButton({
+    required SignUpState state,
+    required BuildContext context,
+  }) {
+    return CustomButton(
+      isEnable: state.isFormValid,
+      title: "SIGN UP",
+      onPressed: () => context.read<SignUpBloc>().add(const SignUpSubmitted()),
+      bgColor: AppColors.primaryColor,
+      textColor: AppColors.whiteColor,
     );
   }
 
   Widget? _getSuffixIcon({required CustomTextController con}) {
-    return (con.controller.text.isNotEmpty)
-        ? Icon(
-            con.error != null ? Icons.close : Icons.check,
-            color: con.error != null
-                ? AppColors.redColor
-                : AppColors.primaryColor,
-          )
-        : null;
+    return ValueListenableBuilder<String?>(
+      valueListenable: con.errorNotifier,
+      builder: (context, error, _) {
+        return (con.controller.text.isNotEmpty)
+            ? Icon(
+                error != null ? Icons.close : Icons.check,
+                color: error != null
+                    ? AppColors.redColor
+                    : AppColors.primaryColor,
+              )
+            : const SizedBox.shrink();
+      },
+    );
   }
 }
